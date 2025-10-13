@@ -1,0 +1,30 @@
+{
+  "name": "senxor-js",
+  "version": "0.0.0",
+  "description": "A JavaScript SDK for seamless integration with Meridian Innovation's thermal imaging sensors.",
+  "private": true,
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/MeridianInnovation/senxor-js#readme",
+  "bugs": {
+    "url": "https://github.com/MeridianInnovation/senxor-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeridianInnovation/senxor-js.git"
+  },
+  "author": "Shui <zelongshui@meridianinno.com>",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "release": "pnpm -r release"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "bumpp": "^10.3.1",
+    "tsdown": "^0.16.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.7"
+  }
+}

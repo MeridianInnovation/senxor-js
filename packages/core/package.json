@@ -1,0 +1,36 @@
+{
+  "name": "@senxor/core",
+  "version": "0.0.0",
+  "description": "The core library for the Senxor JavaScript SDK.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/MeridianInnovation/senxor-js#readme",
+  "bugs": {
+    "url": "https://github.com/MeridianInnovation/senxor-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeridianInnovation/senxor-js.git"
+  },
+  "author": "Shui <zelongshui@meridianinno.com>",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp && npm publish"
+  }
+}
