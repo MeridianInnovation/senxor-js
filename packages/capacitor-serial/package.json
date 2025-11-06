@@ -29,6 +29,11 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@senxor/core": "workspace:*",
+    "@senxor/web-serial": "workspace:*",
+    "serial-adaptor-capacitor": "^2.0.2"
+  },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
