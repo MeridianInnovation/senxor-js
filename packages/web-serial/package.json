@@ -28,5 +28,11 @@
     "dev": "tsdown --watch",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "@senxor/core": "workspace:*",
+    "serial-packet-parser": "^1.0.1",
+    "serial-adaptor-web": "^2.0.2"
   }
 }
