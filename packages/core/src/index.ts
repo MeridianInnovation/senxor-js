@@ -1,3 +1,3 @@
-export const myFunction = () => {
-  return 'Hello, world!'
-}
+export * as consts from "./consts";
+export * from "./error";
+export * from "./types";

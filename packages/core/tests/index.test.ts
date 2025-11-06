@@ -1,6 +1,5 @@
-import { expect, test } from 'vitest'
-import { myFunction } from '../src'
+import { expect, test } from "vitest";
 
-test('myFunction', () => {
-  expect(myFunction()).toBe('Hello, world!')
-})
+test("empty test", () => {
+  expect(true).toBe(true);
+});
