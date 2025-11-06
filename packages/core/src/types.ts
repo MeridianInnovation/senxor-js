@@ -26,16 +26,18 @@ export type SenxorData = {
 
 export interface ISenxorTransport {
   isOpen: boolean;
-  deviceInfo: Record<string, unknown>;
+  deviceInfo: object;
 
   open(): Promise<void>;
   close(): Promise<void>;
 
   readReg(address: number): Promise<number>;
   writeReg(address: number, value: number): Promise<void>;
+  readRegs(addresses: number[]): Promise<Record<number, number>>;
 
   onData(listener: (data: SenxorRawData) => void): void;
   onError(listener: (error: SenxorTransportError) => void): void;
   onOpen(listener: () => void): void;
   onClose(listener: () => void): void;
+  onDisconnect(listener: () => void): void;
 }
