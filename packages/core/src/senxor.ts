@@ -48,6 +48,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
         refresh: false,
       });
       this._isStreaming = isStreaming === 1 ? true : false;
+      await this.setUpSenxor();
       this._isOpen = true;
       this.openListener?.();
     });
@@ -91,6 +92,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   async writeReg(address: number, value: number) {
     try {
+      this.validateWriteReg(address, value);
       await this.transport.writeReg(address, value);
       this.registers[address] = value;
     } catch (error) {
@@ -130,6 +132,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     if (!fieldInfo.writable) {
       throw new SenxorError(`Field ${field} is read-only`);
     }
+    this.validateSetFieldValue(field, value);
 
     if (fieldInfo.selfReset) {
       await this.readReg(fieldInfo.addr);
@@ -162,6 +165,42 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   onDisconnect(listener: () => void) {
     this.disconnectListener = listener;
+  }
+
+  private async setUpSenxor() {
+    // Some settings are not supported yet.
+    // So we need to set them to default values.
+
+    await this.setFieldValue("TEMP_UNITS", 0);
+    await this.setFieldValue("NO_HEADER", 0);
+  }
+
+  private validateWriteReg(addr: number, value: number) {
+    if (addr < 0 || addr > 0xff) {
+      throw new SenxorError(`Invalid register address: ${addr}`);
+    }
+    if (value < 0 || value > 0xff) {
+      throw new SenxorError(`Invalid register value: ${value}`);
+    }
+  }
+
+  private validateSetFieldValue(field: FieldName, value: number) {
+    switch (field) {
+      case "TEMP_UNITS":
+        if (value !== 0) {
+          throw new SenxorError(
+            `TEMP_UNITS is not supported yet in senxor.js.`
+          );
+        }
+        break;
+      case "NO_HEADER":
+        if (value !== 0) {
+          throw new SenxorError(`NO_HEADER is not supported yet in senxor.js.`);
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   private handleTransportData(data: SenxorRawData) {
