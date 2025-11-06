@@ -1,3 +1,7 @@
+import { KELVIN, SENXOR_FRAME_SHAPE } from "./consts";
+import type { SenxorRawData, SenxorData } from "./types";
+import { SenxorError } from "./error";
+
 export const getBits = (value: number, start: number, end: number) => {
   if (value < 0 || value > 0xffffffff) {
     throw new Error("Value must be a valid 32-bit unsigned integer");
@@ -55,4 +59,34 @@ export const setBits = (
   const shiftedWriteValue = newBits << start;
 
   return clearedValue | shiftedWriteValue;
+};
+
+export const dkToCelsius = (dk: number): number => {
+  return dk / 10 - KELVIN;
+};
+
+export const getFrameShape = (
+  frameLength: number
+): { width: number; height: number } => {
+  const shape =
+    SENXOR_FRAME_SHAPE[frameLength as keyof typeof SENXOR_FRAME_SHAPE];
+  if (!shape) {
+    throw new SenxorError(
+      `Parse Senxor Data Error: Unknown frame shape for length: ${frameLength}`
+    );
+  }
+  return shape;
+};
+
+export const processRawSenxorData = (data: SenxorRawData): SenxorData => {
+  const raw = data.frame;
+  const rawFrame = new Uint16Array(raw.buffer, raw.byteOffset, raw.length / 2);
+  const shape = getFrameShape(rawFrame.length);
+  const celsiusFrame = Float32Array.from(rawFrame, dkToCelsius);
+  return {
+    frame: celsiusFrame,
+    width: shape.width,
+    height: shape.height,
+    timestamp: data.timestamp,
+  };
 };
