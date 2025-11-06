@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  exports: true,
-  // ...config options
-})
+  platform: "browser",
+  exports: {
+    devExports: true,
+  },
+});
