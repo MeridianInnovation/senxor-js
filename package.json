@@ -15,9 +15,10 @@
   "author": "Shui <zelongshui@meridianinno.com>",
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "pnpm -r dev",
-    "test": "pnpm -r test",
+    "dev": "pnpm tsdown --watch",
+    "test": "pnpm vitest",
     "typecheck": "pnpm -r typecheck",
+    "lint": "eslint packages/*/src/**",
     "release": "pnpm -r release"
   },
   "devDependencies": {
