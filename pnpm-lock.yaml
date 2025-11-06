@@ -45,6 +45,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
 
+  packages/web-serial: {}
+
 packages:
 
   '@babel/generator@7.28.5':
