@@ -32,5 +32,8 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "release": "bumpp && npm publish"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0"
   }
 }
