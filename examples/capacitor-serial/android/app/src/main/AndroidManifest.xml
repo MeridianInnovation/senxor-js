@@ -20,8 +20,11 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
-
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
         </activity>
 
         <provider
@@ -35,7 +38,9 @@
         </provider>
     </application>
 
-    <!-- Permissions -->
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
     <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
