@@ -1,0 +1,10 @@
+{
+  "appId": "com.senxor.capacitor.demo",
+  "appName": "Senxor Capacitor Demo",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}
