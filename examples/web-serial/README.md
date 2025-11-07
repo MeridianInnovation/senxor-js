@@ -5,7 +5,7 @@ This is an example of how to use the Senxor Web Serial library.
 ## Usage
 
 ```bash
+cd examples/web-serial
 pnpm install
-cd packages/web-serial/example
-npx vite
+pnpm dev
 ```
