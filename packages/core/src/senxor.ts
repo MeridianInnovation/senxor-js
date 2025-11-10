@@ -3,7 +3,7 @@ import { SenxorError, SenxorTransportError } from "./error";
 import type { ISenxorTransport, SenxorRawData } from "./types";
 import { REGISTERS } from "./registers";
 import { FIELDS } from "./fields";
-import { getBits, setBits, processRawSenxorData } from "./processors";
+import { getBits, setBits, processRawSenxorData } from "./utils";
 import type { FieldName } from "./fields";
 import type { SenxorData } from "./types";
 

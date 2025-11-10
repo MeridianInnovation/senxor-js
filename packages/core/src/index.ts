@@ -1,5 +1,5 @@
 export * as consts from "./consts";
-export * as senxorProcessor from "./processors";
+export * as utils from "./utils";
 export * from "./error";
 export * from "./types";
 
