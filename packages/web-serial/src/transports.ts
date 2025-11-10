@@ -36,7 +36,7 @@ export class SerialTransportBase<TPort extends ISerialPort>
     const parserOptions = {
       ...messageParserOptions,
       onMessage: this.handleMessage.bind(this),
-      onError: this.handlePortError.bind(this),
+      onError: this.handleParserError.bind(this),
     };
     this.parser = new PrefixLengthParser(parserOptions);
     this.setupPortEventListeners();
@@ -167,6 +167,11 @@ export class SerialTransportBase<TPort extends ISerialPort>
       timestamp,
     };
     this.dataListener?.(senxorRawData);
+  }
+
+  private handleParserError(error: Error) {
+    const err = new SenxorTransportError("Parser error", error);
+    this.errorListener?.(err);
   }
 
   private handlePortError(error: Error) {
