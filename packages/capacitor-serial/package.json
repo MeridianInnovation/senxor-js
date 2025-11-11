@@ -32,7 +32,10 @@
   "dependencies": {
     "@senxor/core": "workspace:*",
     "@senxor/web-serial": "workspace:*",
-    "serial-adaptor-capacitor": "^2.0.2"
+    "serial-adaptor-capacitor": "latest"
+  },
+  "peerDependencies": {
+    "capacitor-serial-plugin": "^1.1.1"
   },
   "publishConfig": {
     "exports": {
