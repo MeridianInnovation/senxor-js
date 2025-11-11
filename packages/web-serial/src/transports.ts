@@ -63,7 +63,7 @@ export class SerialTransportBase<TPort extends ISerialPort>
       throw new SenxorTransportError("Cannot read register: port is closed");
     }
     const command = senxorAckEncoder.RREG(address);
-    return this.commandSender.sendCommand("RREG", command, 2000, 2);
+    return this.commandSender.sendCommand("RREG", command, 1000, 2);
   }
 
   async readRegs(addresses: number[]): Promise<Record<number, number>> {
@@ -71,7 +71,7 @@ export class SerialTransportBase<TPort extends ISerialPort>
       throw new SenxorTransportError("Cannot read registers: port is closed");
     }
     const commands = senxorAckEncoder.RRSE(addresses);
-    return this.commandSender.sendCommand("RRSE", commands, 2000, 2);
+    return this.commandSender.sendCommand("RRSE", commands, 1000, 2);
   }
 
   async writeReg(address: number, value: number): Promise<void> {
@@ -79,7 +79,7 @@ export class SerialTransportBase<TPort extends ISerialPort>
       throw new SenxorTransportError("Cannot write register: port is closed");
     }
     const command = senxorAckEncoder.WREG(address, value);
-    return this.commandSender.sendCommand("WREG", command, 2000, 2);
+    return this.commandSender.sendCommand("WREG", command, 1000, 2);
   }
 
   onData(listener: (data: SenxorRawData) => void): void {
