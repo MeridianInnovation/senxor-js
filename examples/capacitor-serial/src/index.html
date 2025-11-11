@@ -1,14 +1,59 @@
-<!doctype html>
-<html lang="en" dir="ltr">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Awesome Capacitor App</title>
-    <meta
-      name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Senxor Capacitor Serial Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .controls {
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+      }
+
+      .status {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      canvas {
+        border: 1px solid #ccc;
+        margin: 10px 0;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
 
     <script
       type="module"
@@ -24,9 +69,59 @@
     <link rel="stylesheet" href="./css/style.css" />
     <meta name="theme-color" content="#31d53d" />
   </head>
-  <body>
-    <capacitor-welcome></capacitor-welcome>
 
-    <script src="./js/capacitor-welcome.js" type="module"></script>
+  <body>
+    <div class="container">
+      <h1>Senxor Capacitor Serial Demo</h1>
+
+      <div class="status info" id="status">Ready to connect</div>
+
+      <div class="controls">
+        <h3>Device Discovery</h3>
+        <button id="listBtn">List Devices</button>
+      </div>
+
+      <div class="controls">
+        <h3>Device Control</h3>
+        <button id="connectBtn" disabled>Connect</button>
+        <button id="disconnectBtn" disabled>Disconnect</button>
+        <button id="startStreamBtn" disabled>Start Stream</button>
+        <button id="stopStreamBtn" disabled>Stop Stream</button>
+      </div>
+      <div id="canvasContainer">
+        <h3>Temperature Visualization</h3>
+        <canvas id="tempCanvas" width="320" height="240"></canvas>
+        <div>
+          <label
+            >Temperature Range:
+            <span id="tempRange">0°C - 50°C</span>
+          </label>
+        </div>
+      </div>
+      <div class="controls">
+        <h3>Field Control</h3>
+        <div style="margin-bottom: 10px">
+          <label
+            >Field:
+            <select id="fieldSelect">
+              <option value="">Select a field...</option>
+            </select>
+          </label>
+        </div>
+        <div style="margin-bottom: 10px">
+          <button id="getFieldBtn" disabled>Get Value</button>
+          <button id="setFieldBtn" disabled>Set Value</button>
+          <input
+            type="number"
+            id="fieldValueInput"
+            placeholder="Value"
+            style="width: 80px"
+          />
+        </div>
+        <div id="fieldStatus" style="font-size: 14px; color: #666"></div>
+      </div>
+    </div>
+
+    <script src="./js/senxor-demo.js" type="module"></script>
   </body>
 </html>
