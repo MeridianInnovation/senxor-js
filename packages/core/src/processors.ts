@@ -1,4 +1,5 @@
 import type { SenxorData, SenxorHeader } from "./types";
+import colormapData from "./colormaps.json";
 
 export type senxorNormalizedData<T = Uint8ClampedArray | Float32Array> = {
   header?: SenxorHeader;
@@ -122,4 +123,102 @@ export const createGrayScaleImageData = (
   }
 
   return new ImageData(rgbaData, width, height);
+};
+
+/**
+ * Apply Color LUT to senxorNormalizedData
+ * @param data - senxorNormalizedData to apply LUT to
+ * @param lut - Color LUT to apply, must be a 256x3 Uint8Array, in the order of R, G, B, R, G, B, ...
+ * @returns ImageData object
+ */
+export const applyColorLUT = (
+  data: senxorNormalizedData,
+  lut: Uint8Array
+): ImageData => {
+  const { frame, width, height } = data;
+  const rgbaData = new Uint8ClampedArray(width * height * 4);
+
+  for (let i = 0; i < frame.length; i++) {
+    let grayValue: number;
+
+    if (frame instanceof Float32Array) {
+      grayValue = Math.round(frame[i] * 255);
+    } else {
+      grayValue = frame[i];
+    }
+
+    const lutIndex = grayValue * 3;
+    const rgbaIndex = i * 4;
+
+    rgbaData[rgbaIndex] = lut[lutIndex]; // R
+    rgbaData[rgbaIndex + 1] = lut[lutIndex + 1]; // G
+    rgbaData[rgbaIndex + 2] = lut[lutIndex + 2]; // B
+    rgbaData[rgbaIndex + 3] = 255; // A
+  }
+
+  return new ImageData(rgbaData, width, height);
+};
+
+export type ColorMap = "rainbow2";
+
+/**
+ * Color maps are stored in base64 format in colormaps.json
+ */
+const colormaps: Record<ColorMap, Uint8Array | undefined> = {
+  rainbow2: undefined,
+};
+
+/**
+ * Load color map from colormaps.json into colormaps
+ * @param name - Color map name to load
+ * @returns void
+ */
+export const loadColorMap = async (name: ColorMap): Promise<void> => {
+  if (!(name in colormapData)) {
+    throw new Error(`Color map "${name}" not found`);
+  }
+
+  const base64 = colormapData[name as keyof typeof colormapData];
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  colormaps[name] = bytes;
+};
+
+/**
+ * Get list of available color maps
+ * @returns Array of color map names
+ */
+export const getColorMapList = (): string[] => {
+  return Object.keys(colormapData);
+};
+
+/**
+ * Apply color map to senxorNormalizedData
+ * @param data - senxorNormalizedData to apply color map to
+ * @param map - Color map name to apply
+ * @returns ImageData object
+ */
+export const applyColorMap = async (
+  data: senxorNormalizedData,
+  map: ColorMap
+): Promise<ImageData> => {
+  if (!(map in colormapData)) {
+    throw new Error(`Color map "${map}" not found`);
+  }
+
+  if (!colormaps[map]) {
+    await loadColorMap(map);
+  }
+
+  const lut = colormaps[map];
+  if (!lut) {
+    throw new Error(`Failed to load color map "${map}"`);
+  }
+
+  return applyColorLUT(data, lut);
 };
