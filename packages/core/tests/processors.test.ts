@@ -6,7 +6,7 @@ import {
   nomalizeSenxorData,
   createGrayScaleImageData,
   applyColorLUT,
-  loadColorMap,
+  registerColorMap,
   getColorMapList,
   applyColorMap,
 } from "../src/processors";
@@ -178,26 +178,66 @@ describe("Processors", () => {
     });
   });
 
-  describe("getColorMapList", () => {
-    it("should return list of available color maps", () => {
-      const maps = getColorMapList();
+  describe("registerColorMap", () => {
+    it("should register and use custom color map", () => {
+      // Create a custom LUT (768 bytes = 256 * 3)
+      const customLUT = new Uint8Array(256 * 3);
+      for (let i = 0; i < 256; i++) {
+        customLUT[i * 3] = 255 - i; // R: reverse gradient
+        customLUT[i * 3 + 1] = i; // G: normal gradient
+        customLUT[i * 3 + 2] = 128; // B: constant
+      }
 
-      expect(Array.isArray(maps)).toBe(true);
-      expect(maps.length).toBeGreaterThan(0);
-      expect(maps.includes("rainbow2")).toBe(true);
+      // Register the custom color map
+      registerColorMap("custom", customLUT);
+
+      // Verify it's in the list
+      const maps = getColorMapList();
+      expect(maps).toContain("custom");
+
+      // Verify it can be used with applyColorMap
+      const mockData = createMockSenxorData();
+      const normalized = nomalizeSenxorData(mockData);
+      const imageData = applyColorMap(normalized, "custom");
+
+      expect(imageData.width).toBe(WIDTH);
+      expect(imageData.height).toBe(HEIGHT);
+      expect(imageData.data.length).toBe(PIXEL_COUNT * 4);
+    });
+
+    it("should overwrite existing color map", () => {
+      // Create two different LUTs
+      const lut1 = new Uint8Array(256 * 3).fill(100);
+      const lut2 = new Uint8Array(256 * 3).fill(200);
+
+      // Register first LUT
+      registerColorMap("test-overwrite", lut1);
+
+      // Register second LUT with same name (should overwrite)
+      registerColorMap("test-overwrite", lut2);
+
+      // Verify only one entry in the list
+      const maps = getColorMapList();
+      const testOverwriteCount = maps.filter(
+        (name) => name === "test-overwrite"
+      ).length;
+      expect(testOverwriteCount).toBe(1);
     });
   });
 
-  describe("loadColorMap", () => {
-    it("should load color map from base64", () => {
-      loadColorMap("rainbow2");
-      // If no error is thrown, the test passes
-      expect(true).toBe(true);
-    });
+  describe("getColorMapList", () => {
+    it("should include registered color maps", () => {
+      const initialMaps = getColorMapList();
+      const initialCount = initialMaps.length;
 
-    it("should throw error for non-existent color map", () => {
-      // @ts-expect-error Testing invalid color map name
-      expect(() => loadColorMap("nonexistent")).toThrow();
+      // Register a new color map
+      const testLUT = new Uint8Array(256 * 3).fill(50);
+      registerColorMap("test-list", testLUT);
+
+      // Verify the new map is included
+      const updatedMaps = getColorMapList();
+      expect(updatedMaps).toContain("test-list");
+      expect(updatedMaps.length).toBe(initialCount + 1);
     });
   });
 
@@ -238,7 +278,6 @@ describe("Processors", () => {
       const mockData = createMockSenxorData();
       const normalized = nomalizeSenxorData(mockData);
 
-      // @ts-expect-error Testing invalid color map name
       expect(() => applyColorMap(normalized, "nonexistent")).toThrow();
     });
   });

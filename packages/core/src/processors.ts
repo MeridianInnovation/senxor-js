@@ -153,7 +153,7 @@ export const applyColorLUT = (
   return new ImageData(rgbaData, width, height);
 };
 
-export type ColorMap = "rainbow2";
+export type ColorMap = "rainbow2" | string;
 
 /**
  * Color maps are stored in base64 format in colormaps.json
@@ -163,11 +163,15 @@ const colormaps: Record<ColorMap, Uint8Array | undefined> = {
 };
 
 /**
- * Load color map from colormaps.json into colormaps
- * @param name - Color map name to load
- * @returns void
+ * Register a color map
+ * @param name - Color map name
+ * @param lut - Color map LUT
  */
-export const loadColorMap = (name: ColorMap): void => {
+export const registerColorMap = (name: ColorMap, lut: Uint8Array): void => {
+  colormaps[name] = lut;
+};
+
+const loadColorMap = (name: ColorMap): void => {
   if (!(name in colormapData)) {
     throw new Error(`Color map "${name}" not found`);
   }
@@ -188,7 +192,7 @@ export const loadColorMap = (name: ColorMap): void => {
  * @returns Array of color map names
  */
 export const getColorMapList = (): string[] => {
-  return Object.keys(colormapData);
+  return Object.keys(colormaps);
 };
 
 /**
@@ -201,7 +205,7 @@ export const applyColorMap = (
   data: senxorNormalizedData,
   map: ColorMap
 ): ImageData => {
-  if (!(map in colormapData)) {
+  if (!(map in colormaps)) {
     throw new Error(`Color map "${map}" not found`);
   }
 
