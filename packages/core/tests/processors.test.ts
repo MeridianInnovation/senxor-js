@@ -189,24 +189,24 @@ describe("Processors", () => {
   });
 
   describe("loadColorMap", () => {
-    it("should load color map from base64", async () => {
-      await loadColorMap("rainbow2");
+    it("should load color map from base64", () => {
+      loadColorMap("rainbow2");
       // If no error is thrown, the test passes
       expect(true).toBe(true);
     });
 
-    it("should throw error for non-existent color map", async () => {
+    it("should throw error for non-existent color map", () => {
       // @ts-expect-error Testing invalid color map name
-      await expect(loadColorMap("nonexistent")).rejects.toThrow();
+      expect(() => loadColorMap("nonexistent")).toThrow();
     });
   });
 
   describe("applyColorMap", () => {
-    it("should load and apply rainbow2 color map", async () => {
+    it("should load and apply rainbow2 color map", () => {
       const mockData = createMockSenxorData();
       const normalized = nomalizeSenxorData(mockData);
 
-      const imageData = await applyColorMap(normalized, "rainbow2");
+      const imageData = applyColorMap(normalized, "rainbow2");
 
       expect(imageData.width).toBe(WIDTH);
       expect(imageData.height).toBe(HEIGHT);
@@ -218,33 +218,33 @@ describe("Processors", () => {
       }
     });
 
-    it("should cache color map on second call", async () => {
+    it("should cache color map on second call", () => {
       const mockData = createMockSenxorData();
       const normalized1 = nomalizeSenxorData(mockData);
       const normalized2 = nomalizeSenxorData(mockData);
 
       const start1 = performance.now();
-      await applyColorMap(normalized1, "rainbow2");
+      applyColorMap(normalized1, "rainbow2");
       const time1 = performance.now() - start1;
 
       const start2 = performance.now();
-      await applyColorMap(normalized2, "rainbow2");
+      applyColorMap(normalized2, "rainbow2");
       const time2 = performance.now() - start2;
 
       expect(time2).toBeLessThan(time1);
     });
 
-    it("should throw error for non-existent color map", async () => {
+    it("should throw error for non-existent color map", () => {
       const mockData = createMockSenxorData();
       const normalized = nomalizeSenxorData(mockData);
 
       // @ts-expect-error Testing invalid color map name
-      await expect(applyColorMap(normalized, "nonexistent")).rejects.toThrow();
+      expect(() => applyColorMap(normalized, "nonexistent")).toThrow();
     });
   });
 
   describe("integration test", () => {
-    it("should process mock sensor data end-to-end", async () => {
+    it("should process mock sensor data end-to-end", () => {
       const mockData = createMockSenxorData();
 
       const normalizedData = nomalizeSenxorData(mockData);
@@ -253,7 +253,7 @@ describe("Processors", () => {
       expect(normalizedData.maxTemperature).toBeDefined();
 
       const grayImageData = createGrayScaleImageData(normalizedData);
-      const colorImageData = await applyColorMap(normalizedData, "rainbow2");
+      const colorImageData = applyColorMap(normalizedData, "rainbow2");
 
       expect(grayImageData.width).toBe(WIDTH);
       expect(colorImageData.width).toBe(WIDTH);

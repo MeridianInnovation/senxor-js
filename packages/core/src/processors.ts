@@ -167,7 +167,7 @@ const colormaps: Record<ColorMap, Uint8Array | undefined> = {
  * @param name - Color map name to load
  * @returns void
  */
-export const loadColorMap = async (name: ColorMap): Promise<void> => {
+export const loadColorMap = (name: ColorMap): void => {
   if (!(name in colormapData)) {
     throw new Error(`Color map "${name}" not found`);
   }
@@ -197,16 +197,16 @@ export const getColorMapList = (): string[] => {
  * @param map - Color map name to apply
  * @returns ImageData object
  */
-export const applyColorMap = async (
+export const applyColorMap = (
   data: senxorNormalizedData,
   map: ColorMap
-): Promise<ImageData> => {
+): ImageData => {
   if (!(map in colormapData)) {
     throw new Error(`Color map "${map}" not found`);
   }
 
   if (!colormaps[map]) {
-    await loadColorMap(map);
+    loadColorMap(map);
   }
 
   const lut = colormaps[map];
