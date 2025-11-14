@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
 import type { SenxorData } from "../src/types";
 import {
-  normalize,
-  dataToGrayScaleUint8,
-  dataToGrayScaleFloat,
+  getMinMax,
+  normalizeFloat32Array,
+  nomalizeSenxorData,
   createGrayScaleImageData,
   applyColorLUT,
+  loadColorMap,
   getColorMapList,
   applyColorMap,
 } from "../src/processors";
@@ -54,10 +55,28 @@ function createMockSenxorData(): SenxorData {
 }
 
 describe("Processors", () => {
-  describe("normalize", () => {
+  describe("getMinMax", () => {
+    it("should return min and max from Float32Array", () => {
+      const array = new Float32Array([10, 5, 20, 15]);
+      const result = getMinMax(array);
+
+      expect(result.min).toBe(5);
+      expect(result.max).toBe(20);
+    });
+
+    it("should handle single element array", () => {
+      const array = new Float32Array([42]);
+      const result = getMinMax(array);
+
+      expect(result.min).toBe(42);
+      expect(result.max).toBe(42);
+    });
+  });
+
+  describe("normalizeFloat32Array", () => {
     it("should normalize array to 0-1 range", () => {
       const array = new Float32Array([0, 50, 100]);
-      const normalized = normalize(array);
+      const normalized = normalizeFloat32Array(array);
 
       expect(normalized[0]).toBe(0);
       expect(normalized[1]).toBe(0.5);
@@ -66,7 +85,7 @@ describe("Processors", () => {
 
     it("should return 0.5 for equal values", () => {
       const array = new Float32Array([42, 42, 42]);
-      const normalized = normalize(array);
+      const normalized = normalizeFloat32Array(array);
 
       expect(normalized[0]).toBe(0.5);
       expect(normalized[1]).toBe(0.5);
@@ -75,7 +94,7 @@ describe("Processors", () => {
 
     it("should use provided min/max", () => {
       const array = new Float32Array([10, 20, 30]);
-      const normalized = normalize(array, 0, 40);
+      const normalized = normalizeFloat32Array(array, 0, 40);
 
       expect(normalized[0]).toBe(0.25);
       expect(normalized[1]).toBe(0.5);
@@ -83,41 +102,39 @@ describe("Processors", () => {
     });
   });
 
-  describe("dataToGrayScaleUint8", () => {
-    it("should convert SenxorData to Uint8 grayscale", () => {
+  describe("nomalizeSenxorData", () => {
+    it("should normalize SenxorData correctly", () => {
       const mockData = createMockSenxorData();
-      const result = dataToGrayScaleUint8(mockData);
-
-      expect(result.frame).toBeInstanceOf(Uint8ClampedArray);
-      expect(result.width).toBe(WIDTH);
-      expect(result.height).toBe(HEIGHT);
-      expect(result.frame.length).toBe(PIXEL_COUNT);
-      expect(result.timestamp).toBe(mockData.timestamp);
-
-      expect(result.frame[0]).toBeGreaterThanOrEqual(0);
-      expect(result.frame[0]).toBeLessThanOrEqual(255);
-    });
-  });
-
-  describe("dataToGrayScaleFloat", () => {
-    it("should convert SenxorData to Float32 grayscale", () => {
-      const mockData = createMockSenxorData();
-      const result = dataToGrayScaleFloat(mockData);
+      const result = nomalizeSenxorData(mockData);
 
       expect(result.frame).toBeInstanceOf(Float32Array);
       expect(result.width).toBe(WIDTH);
       expect(result.height).toBe(HEIGHT);
       expect(result.frame.length).toBe(PIXEL_COUNT);
+      expect(result.timestamp).toBe(mockData.timestamp);
+
+      // Test new fields
+      expect(result.minTemperature).toBeDefined();
+      expect(result.maxTemperature).toBeDefined();
+      expect(result.minTemperature).toBeLessThanOrEqual(result.maxTemperature);
 
       expect(result.frame[0]).toBeGreaterThanOrEqual(0);
       expect(result.frame[0]).toBeLessThanOrEqual(1);
+    });
+
+    it("should use provided min/max parameters", () => {
+      const mockData = createMockSenxorData();
+      const result = nomalizeSenxorData(mockData, 15, 25);
+
+      expect(result.minTemperature).toBe(15);
+      expect(result.maxTemperature).toBe(25);
     });
   });
 
   describe("createGrayScaleImageData", () => {
     it("should create ImageData from normalized data", () => {
       const mockData = createMockSenxorData();
-      const normalized = dataToGrayScaleFloat(mockData);
+      const normalized = nomalizeSenxorData(mockData);
       const imageData = createGrayScaleImageData(normalized);
 
       expect(imageData.width).toBe(WIDTH);
@@ -147,7 +164,7 @@ describe("Processors", () => {
       }
 
       const mockData = createMockSenxorData();
-      const normalized = dataToGrayScaleFloat(mockData);
+      const normalized = nomalizeSenxorData(mockData);
       const imageData = applyColorLUT(normalized, lut);
 
       expect(imageData.width).toBe(WIDTH);
@@ -171,10 +188,23 @@ describe("Processors", () => {
     });
   });
 
-  describe("loadColorMap and applyColorMap", () => {
+  describe("loadColorMap", () => {
+    it("should load color map from base64", async () => {
+      await loadColorMap("rainbow2");
+      // If no error is thrown, the test passes
+      expect(true).toBe(true);
+    });
+
+    it("should throw error for non-existent color map", async () => {
+      // @ts-expect-error Testing invalid color map name
+      await expect(loadColorMap("nonexistent")).rejects.toThrow();
+    });
+  });
+
+  describe("applyColorMap", () => {
     it("should load and apply rainbow2 color map", async () => {
       const mockData = createMockSenxorData();
-      const normalized = dataToGrayScaleFloat(mockData);
+      const normalized = nomalizeSenxorData(mockData);
 
       const imageData = await applyColorMap(normalized, "rainbow2");
 
@@ -190,8 +220,8 @@ describe("Processors", () => {
 
     it("should cache color map on second call", async () => {
       const mockData = createMockSenxorData();
-      const normalized1 = dataToGrayScaleFloat(mockData);
-      const normalized2 = dataToGrayScaleFloat(mockData);
+      const normalized1 = nomalizeSenxorData(mockData);
+      const normalized2 = nomalizeSenxorData(mockData);
 
       const start1 = performance.now();
       await applyColorMap(normalized1, "rainbow2");
@@ -206,7 +236,7 @@ describe("Processors", () => {
 
     it("should throw error for non-existent color map", async () => {
       const mockData = createMockSenxorData();
-      const normalized = dataToGrayScaleFloat(mockData);
+      const normalized = nomalizeSenxorData(mockData);
 
       // @ts-expect-error Testing invalid color map name
       await expect(applyColorMap(normalized, "nonexistent")).rejects.toThrow();
@@ -217,14 +247,13 @@ describe("Processors", () => {
     it("should process mock sensor data end-to-end", async () => {
       const mockData = createMockSenxorData();
 
-      const uint8Data = dataToGrayScaleUint8(mockData);
-      expect(uint8Data.frame).toBeInstanceOf(Uint8ClampedArray);
+      const normalizedData = nomalizeSenxorData(mockData);
+      expect(normalizedData.frame).toBeInstanceOf(Float32Array);
+      expect(normalizedData.minTemperature).toBeDefined();
+      expect(normalizedData.maxTemperature).toBeDefined();
 
-      const floatData = dataToGrayScaleFloat(mockData);
-      expect(floatData.frame).toBeInstanceOf(Float32Array);
-
-      const grayImageData = createGrayScaleImageData(floatData);
-      const colorImageData = await applyColorMap(floatData, "rainbow2");
+      const grayImageData = createGrayScaleImageData(normalizedData);
+      const colorImageData = await applyColorMap(normalizedData, "rainbow2");
 
       expect(grayImageData.width).toBe(WIDTH);
       expect(colorImageData.width).toBe(WIDTH);
