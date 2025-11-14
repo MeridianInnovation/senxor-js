@@ -1,12 +1,34 @@
 import type { SenxorData, SenxorHeader } from "./types";
 import colormapData from "./colormaps.json";
 
-export type senxorNormalizedData<T = Uint8ClampedArray | Float32Array> = {
+export type senxorNormalizedData = {
   header?: SenxorHeader;
-  frame: T;
+  frame: Float32Array;
   width: number;
   height: number;
+  minTemperature: number;
+  maxTemperature: number;
   timestamp: number;
+};
+
+/**
+ * Get minimum and maximum values from Float32Array
+ * @param array - Float32Array to get minimum and maximum values from
+ * @returns { min: number; max: number }
+ */
+export const getMinMax = (
+  array: Float32Array
+): { min: number; max: number } => {
+  let min = array[0];
+  let max = array[0];
+
+  for (let i = 0; i < array.length; i++) {
+    const value = array[i];
+    if (value < min) min = value;
+    if (value > max) max = value;
+  }
+
+  return { min, max };
 };
 
 /**
@@ -17,7 +39,7 @@ export type senxorNormalizedData<T = Uint8ClampedArray | Float32Array> = {
  * @param max - Optional maximum value, calculated from array if not provided
  * @returns Normalized Float32Array
  */
-export const normalize = (
+export const normalizeFloat32Array = (
   array: Float32Array,
   min?: number,
   max?: number
@@ -26,14 +48,9 @@ export const normalize = (
   let actualMax = max;
 
   if (actualMin === undefined || actualMax === undefined) {
-    actualMin = Infinity;
-    actualMax = -Infinity;
-
-    for (let i = 0; i < array.length; i++) {
-      const value = array[i];
-      if (value < actualMin) actualMin = value;
-      if (value > actualMax) actualMax = value;
-    }
+    const { min, max } = getMinMax(array);
+    actualMin = min;
+    actualMax = max;
   }
 
   if (actualMin === actualMax) {
@@ -51,44 +68,35 @@ export const normalize = (
 };
 
 /**
- * Convert SenxorData to grayscale image with Uint8ClampedArray (0-255 range)
- * @param data - SenxorData to convert
- * @returns senxorNormalizedData<Uint8ClampedArray>
+ * Normalize SenxorData to Float32Array (0-1 range)
+ * @param data - SenxorData to normalize
+ * @param min - Optional minimum value, calculated from array if not provided
+ * @param max - Optional maximum value, calculated from array if not provided
+ * @returns senxorNormalizedData
  */
-export const dataToGrayScaleUint8 = (
-  data: SenxorData
-): senxorNormalizedData<Uint8ClampedArray> => {
-  const normalized = normalize(data.frame);
-  const uint8Data = new Uint8ClampedArray(data.frame.length);
+export const nomalizeSenxorData = (
+  data: SenxorData,
+  min?: number,
+  max?: number
+): senxorNormalizedData => {
+  let actualMin = min;
+  let actualMax = max;
 
-  for (let i = 0; i < normalized.length; i++) {
-    uint8Data[i] = Math.round(normalized[i] * 255);
+  if (actualMin === undefined || actualMax === undefined) {
+    const { min, max } = getMinMax(data.frame);
+    actualMin = min;
+    actualMax = max;
   }
 
-  return {
-    header: data.header,
-    frame: uint8Data,
-    width: data.width,
-    height: data.height,
-    timestamp: data.timestamp,
-  };
-};
-
-/**
- * Convert SenxorData to grayscale image with Float32Array (0-1 range)
- * @param data - SenxorData to convert
- * @returns senxorNormalizedData<Float32Array>
- */
-export const dataToGrayScaleFloat = (
-  data: SenxorData
-): senxorNormalizedData<Float32Array> => {
-  const normalized = normalize(data.frame);
+  const normalized = normalizeFloat32Array(data.frame, actualMin, actualMax);
 
   return {
     header: data.header,
     frame: normalized,
     width: data.width,
     height: data.height,
+    minTemperature: actualMin,
+    maxTemperature: actualMax,
     timestamp: data.timestamp,
   };
 };
@@ -106,14 +114,7 @@ export const createGrayScaleImageData = (
   const rgbaData = new Uint8ClampedArray(width * height * 4);
 
   for (let i = 0; i < frame.length; i++) {
-    let grayValue: number;
-
-    if (frame instanceof Float32Array) {
-      grayValue = Math.round(frame[i] * 255);
-    } else {
-      grayValue = frame[i];
-    }
-
+    const grayValue = Math.round(frame[i] * 255);
     const rgbaIndex = i * 4;
 
     rgbaData[rgbaIndex] = grayValue; // R
@@ -139,14 +140,7 @@ export const applyColorLUT = (
   const rgbaData = new Uint8ClampedArray(width * height * 4);
 
   for (let i = 0; i < frame.length; i++) {
-    let grayValue: number;
-
-    if (frame instanceof Float32Array) {
-      grayValue = Math.round(frame[i] * 255);
-    } else {
-      grayValue = frame[i];
-    }
-
+    const grayValue = Math.round(frame[i] * 255);
     const lutIndex = grayValue * 3;
     const rgbaIndex = i * 4;
 
