@@ -1,15 +1,15 @@
-import { describe, it, expect } from "vitest";
-import type { SenxorData } from "../src/types";
+import { describe, expect, it } from "vitest";
 import {
-  getMinMax,
-  normalizeFloat32Array,
-  nomalizeSenxorData,
-  createGrayScaleImageData,
   applyColorLUT,
-  registerColorMap,
-  getColorMapList,
   applyColorMap,
+  createGrayScaleImageData,
+  getColorMapList,
+  getMinMax,
+  nomalizeSenxorData,
+  normalizeFloat32Array,
+  registerColorMap,
 } from "../src/processors";
+import type { SenxorData } from "../src/types";
 
 // Polyfill for ImageData in Node.js test environment
 if (typeof globalThis.ImageData === "undefined") {
@@ -114,9 +114,9 @@ describe("Processors", () => {
       expect(result.timestamp).toBe(mockData.timestamp);
 
       // Test new fields
-      expect(result.minTemperature).toBeDefined();
-      expect(result.maxTemperature).toBeDefined();
-      expect(result.minTemperature).toBeLessThanOrEqual(result.maxTemperature);
+      expect(result.minValue).toBeDefined();
+      expect(result.maxValue).toBeDefined();
+      expect(result.minValue).toBeLessThanOrEqual(result.maxValue);
 
       expect(result.frame[0]).toBeGreaterThanOrEqual(0);
       expect(result.frame[0]).toBeLessThanOrEqual(1);
@@ -126,8 +126,8 @@ describe("Processors", () => {
       const mockData = createMockSenxorData();
       const result = nomalizeSenxorData(mockData, 15, 25);
 
-      expect(result.minTemperature).toBe(15);
-      expect(result.maxTemperature).toBe(25);
+      expect(result.minValue).toBe(15);
+      expect(result.maxValue).toBe(25);
     });
   });
 
@@ -288,8 +288,8 @@ describe("Processors", () => {
 
       const normalizedData = nomalizeSenxorData(mockData);
       expect(normalizedData.frame).toBeInstanceOf(Float32Array);
-      expect(normalizedData.minTemperature).toBeDefined();
-      expect(normalizedData.maxTemperature).toBeDefined();
+      expect(normalizedData.minValue).toBeDefined();
+      expect(normalizedData.maxValue).toBeDefined();
 
       const grayImageData = createGrayScaleImageData(normalizedData);
       const colorImageData = applyColorMap(normalizedData, "rainbow2");

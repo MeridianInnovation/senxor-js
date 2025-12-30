@@ -6,8 +6,8 @@ export type senxorNormalizedData = {
   frame: Float32Array;
   width: number;
   height: number;
-  minTemperature: number;
-  maxTemperature: number;
+  minValue: number;
+  maxValue: number;
   timestamp: number;
 };
 
@@ -95,8 +95,8 @@ export const nomalizeSenxorData = (
     frame: normalized,
     width: data.width,
     height: data.height,
-    minTemperature: actualMin,
-    maxTemperature: actualMax,
+    minValue: actualMin,
+    maxValue: actualMax,
     timestamp: data.timestamp,
   };
 };
