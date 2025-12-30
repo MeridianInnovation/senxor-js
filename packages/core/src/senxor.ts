@@ -1,19 +1,18 @@
 import { Mutex } from "async-mutex";
 import { SenxorError, SenxorTransportError } from "./error";
-import type { ISenxorTransport, SenxorRawData } from "./types";
-import { REGISTERS } from "./registers";
-import { FIELDS } from "./fields";
-import { getBits, setBits, processRawSenxorData } from "./utils";
 import type { FieldName } from "./fields";
-import type { SenxorData } from "./types";
+import { FIELDS } from "./fields";
+import { REGISTERS } from "./registers";
+import type { ISenxorTransport, SenxorData, SenxorRawData } from "./types";
+import { getBits, processRawSenxorData, setBits } from "./utils";
 
 export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
-  private transport: TTransport;
+  private readonly transport: TTransport;
   private registers: Record<number, number> = {};
   private _isStreaming: boolean = false;
   private _isOpen: boolean = false;
 
-  private mutex: Mutex = new Mutex();
+  private readonly mutex: Mutex = new Mutex();
   private dataListener?: (data: SenxorData) => void;
   private errorListener?: (error: SenxorError) => void;
   private openListener?: () => void;
@@ -51,11 +50,19 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
           error
         );
       }
-      const isStreaming = await this.getFieldValue("CONTINUOUS_STREAM", {
-        refresh: false,
-      });
-      this._isStreaming = isStreaming === 1 ? true : false;
-      await this.setUpSenxor();
+      try {
+        const isStreaming = await this.getFieldValue(
+          "CONTINUOUS_STREAM",
+          false
+        );
+        this._isStreaming = isStreaming === 1;
+        await this.setUpSenxor();
+      } catch (error) {
+        console.warn(
+          "Failed to set up senxor. Some settings may be not available in this device. Error: ",
+          error
+        );
+      }
       this._isOpen = true;
       this.openListener?.();
     });
@@ -125,11 +132,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return values;
   }
 
-  async getFieldValue(
-    field: FieldName,
-    options: { refresh?: boolean } = { refresh: true }
-  ) {
-    const { refresh } = options;
+  async getFieldValue(field: FieldName, refresh: boolean = true) {
     const fieldInfo = FIELDS[field];
     if (!fieldInfo) {
       throw new SenxorError(`Invalid field name: ${field}`);
