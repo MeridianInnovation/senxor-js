@@ -42,27 +42,26 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return this.mutex.runExclusive(async () => {
       if (this._isOpen) return;
       await this.transport.open();
-      try {
-        await this.refreshRegisters();
-      } catch (error) {
+      this.refreshRegisters().catch((error) => {
         console.warn(
           "Failed to refresh all registers. Some registers may be not available in this device. Error: ",
           error
         );
-      }
-      try {
-        const isStreaming = await this.getFieldValue(
-          "CONTINUOUS_STREAM",
-          false
-        );
-        this._isStreaming = isStreaming === 1;
-        await this.setUpSenxor();
-      } catch (error) {
+      });
+      this.setUpSenxor().catch((error) => {
         console.warn(
           "Failed to set up senxor. Some settings may be not available in this device. Error: ",
           error
         );
-      }
+      });
+      this.getFieldValue("CONTINUOUS_STREAM", false)
+        .then((isStreaming) => {
+          this._isStreaming = isStreaming === 1;
+        })
+        .catch((error) => {
+          console.warn("Failed to get continuous stream. Error: ", error);
+        });
+
       this._isOpen = true;
       this.openListener?.();
     });
@@ -124,12 +123,6 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
         `Failed to write register 0x${addressHex} (${registerName}). Error: ${error}`
       );
     }
-  }
-
-  async refreshRegisters() {
-    const addresses = Object.values(REGISTERS).map((register) => register.addr);
-    const values = await this.readRegs(addresses);
-    return values;
   }
 
   async getFieldValue(field: FieldName, refresh: boolean = true) {
@@ -200,9 +193,43 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   private async setUpSenxor() {
     // Some settings are not supported yet.
     // So we need to set them to default values.
-
     await this.setFieldValue("TEMP_UNITS", 0);
     await this.setFieldValue("NO_HEADER", 0);
+  }
+
+  private async refreshRegisters() {
+    const commonNames = [
+      "FRAME_MODE",
+      "FW_VERSION_1",
+      "FW_VERSION_2",
+      "FRAME_RATE",
+      "SENXOR_GAIN",
+      "SENXOR_TYPE",
+      "MODULE_TYPE",
+      "MCU_TYPE",
+      "TEMP_CONVERT_CTRL",
+      "SENSITIVITY_FACTOR",
+      "EMISSIVITY",
+      "OFFSET_CORR",
+      "OBJECT_TEMP_FACTOR",
+      "SENXOR_ID_0",
+      "SENXOR_ID_1",
+      "SENXOR_ID_2",
+      "SENXOR_ID_3",
+      "SENXOR_ID_4",
+      "SENXOR_ID_5",
+      "SENXOR_ID_6",
+      "USER_FLASH_CTRL",
+    ];
+
+    const addresses = commonNames.map((name) => {
+      const register = Object.values(REGISTERS).find(
+        (reg) => reg.name === name
+      );
+      return register!.addr;
+    });
+    const values = await this.readRegs(addresses);
+    return values;
   }
 
   private validateWriteReg(addr: number, value: number) {
