@@ -2,7 +2,7 @@ import { Mutex } from "async-mutex";
 import { MODULE_TYPE, SENXOR_TYPE2FRAME_SHAPE } from "./consts";
 import { SenxorError, SenxorTransportError } from "./error";
 import type { FieldName } from "./fields";
-import { FIELDS } from "./fields";
+import { FIELDS, REGISTER2FIELD } from "./fields";
 import { REGISTERS } from "./registers";
 import type { ISenxorTransport, SenxorData, SenxorRawData } from "./types";
 import { getBits, processRawSenxorData, setBits } from "./utils";
@@ -139,6 +139,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     try {
       const value = await this.transport.readReg(address);
       this._registers[address] = value;
+      this._refreshField(address, value);
       return value;
     } catch (error) {
       const addressHex = address.toString(16).padStart(2, "0");
@@ -153,6 +154,9 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     try {
       const values = await this.transport.readRegs(addresses);
       this._registers = { ...this._registers, ...values };
+      Object.entries(values).forEach(([address, value]) => {
+        this._refreshField(Number(address), value);
+      });
       return values;
     } catch (error) {
       throw new SenxorError(`Failed to read registers. Error: ${error}`);
@@ -164,6 +168,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       this._validateWriteReg(address, value);
       await this.transport.writeReg(address, value);
       this._registers[address] = value;
+      this._refreshField(address, value);
     } catch (error) {
       const addressHex = address.toString(16).padStart(2, "0");
       const registerName = REGISTERS[address].name;
@@ -285,6 +290,20 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     });
     const values = await this.readRegs(addresses);
     return values;
+  }
+
+  private _refreshField(regAddr: number, regValue: number) {
+    const fields = REGISTER2FIELD[regAddr];
+    if (!fields) return;
+    fields.forEach((field) => {
+      const fieldInfo = FIELDS[field];
+      const fieldValue = getBits(
+        regValue,
+        fieldInfo.startBit,
+        fieldInfo.endBit
+      );
+      this._fileds[field] = fieldValue;
+    });
   }
 
   private _validateWriteReg(addr: number, value: number) {

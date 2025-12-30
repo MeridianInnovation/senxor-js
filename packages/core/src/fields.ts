@@ -560,6 +560,19 @@ export const FIELDS: Record<string, FieldInfo> = {
   },
 };
 
+export const REGISTER2FIELD: Record<number, FieldName[]> = (() => {
+  const result: Record<number, FieldName[]> = {};
+  (Object.keys(FIELDS) as FieldName[]).forEach((fieldName) => {
+    const field = FIELDS[fieldName];
+    const addr = field.addr;
+    if (!result[addr]) {
+      result[addr] = [];
+    }
+    result[addr].push(fieldName);
+  });
+  return result;
+})();
+
 export type FieldName =
   | "SW_RESET"
   | "DMA_TIMEOUT_ENABLE"
