@@ -8,7 +8,8 @@ import { getBits, processRawSenxorData, setBits } from "./utils";
 
 export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   private readonly transport: TTransport;
-  private registers: Record<number, number> = {};
+  private _registers: Record<number, number> = {};
+  private _fileds: Partial<Record<FieldName, number>> = {};
   private _isStreaming: boolean = false;
   private _isOpen: boolean = false;
 
@@ -31,11 +32,19 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   }
 
   get deviceInfo() {
-    return this.transport.deviceInfo;
+    return { ...this.transport.deviceInfo };
   }
 
   get isStreaming() {
     return this._isStreaming;
+  }
+
+  get fieldsCache() {
+    return { ...this._fileds };
+  }
+
+  get registersCache() {
+    return { ...this._registers };
   }
 
   async open() {
@@ -71,7 +80,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return this.mutex.runExclusive(async () => {
       if (!this._isOpen) return;
       await this.transport.close();
-      this.registers = {};
+      this._registers = {};
       this._isOpen = false;
       this.closeListener?.();
     });
@@ -90,7 +99,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   async readReg(address: number) {
     try {
       const value = await this.transport.readReg(address);
-      this.registers[address] = value;
+      this._registers[address] = value;
       return value;
     } catch (error) {
       const addressHex = address.toString(16).padStart(2, "0");
@@ -104,7 +113,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   async readRegs(addresses: number[]) {
     try {
       const values = await this.transport.readRegs(addresses);
-      this.registers = { ...this.registers, ...values };
+      this._registers = { ...this._registers, ...values };
       return values;
     } catch (error) {
       throw new SenxorError(`Failed to read registers. Error: ${error}`);
@@ -115,7 +124,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     try {
       this._validateWriteReg(address, value);
       await this.transport.writeReg(address, value);
-      this.registers[address] = value;
+      this._registers[address] = value;
     } catch (error) {
       const addressHex = address.toString(16).padStart(2, "0");
       const registerName = REGISTERS[address].name;
@@ -136,8 +145,14 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
         await this.readReg(fieldInfo.addr);
       }
 
-      const regValue = this.registers[fieldInfo.addr];
-      return getBits(regValue, fieldInfo.startBit, fieldInfo.endBit);
+      const regValue = this._registers[fieldInfo.addr];
+      const fieldValue = getBits(
+        regValue,
+        fieldInfo.startBit,
+        fieldInfo.endBit
+      );
+      this._fileds[field] = fieldValue;
+      return fieldValue;
     } catch (error) {
       throw new SenxorError(`Failed to get field ${field}. Error: ${error}`);
     }
@@ -157,7 +172,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       if (fieldInfo.selfReset) {
         await this.readReg(fieldInfo.addr);
       }
-      const regValue = this.registers[fieldInfo.addr];
+      const regValue = this._registers[fieldInfo.addr];
       const newRegValue = setBits(
         regValue,
         fieldInfo.startBit,
@@ -165,6 +180,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
         value
       );
       await this.writeReg(fieldInfo.addr, newRegValue);
+      this._fileds[field] = value;
     } catch (error) {
       throw new SenxorError(`Failed to set field ${field}. Error: ${error}`);
     }
