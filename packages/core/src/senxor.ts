@@ -21,9 +21,9 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   constructor(transport: TTransport) {
     this.transport = transport;
-    this.transport.onData((data) => this.handleTransportData(data));
-    this.transport.onDisconnect(() => this.handleTransportDisconnect());
-    this.transport.onError((error) => this.handleTransportError(error));
+    this.transport.onData((data) => this._handleTransportData(data));
+    this.transport.onDisconnect(() => this._handleTransportDisconnect());
+    this.transport.onError((error) => this._handleTransportError(error));
   }
 
   get isOpen() {
@@ -42,13 +42,13 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return this.mutex.runExclusive(async () => {
       if (this._isOpen) return;
       await this.transport.open();
-      this.refreshRegisters().catch((error) => {
+      this._refreshRegisters().catch((error) => {
         console.warn(
           "Failed to refresh all registers. Some registers may be not available in this device. Error: ",
           error
         );
       });
-      this.setUpSenxor().catch((error) => {
+      this._setUpSenxor().catch((error) => {
         console.warn(
           "Failed to set up senxor. Some settings may be not available in this device. Error: ",
           error
@@ -113,7 +113,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   async writeReg(address: number, value: number) {
     try {
-      this.validateWriteReg(address, value);
+      this._validateWriteReg(address, value);
       await this.transport.writeReg(address, value);
       this.registers[address] = value;
     } catch (error) {
@@ -151,7 +151,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     if (!fieldInfo.writable) {
       throw new SenxorError(`Field ${field} is read-only`);
     }
-    this.validateSetFieldValue(field, value);
+    this._validateSetFieldValue(field, value);
 
     try {
       if (fieldInfo.selfReset) {
@@ -190,14 +190,14 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     this.disconnectListener = listener;
   }
 
-  private async setUpSenxor() {
+  private async _setUpSenxor() {
     // Some settings are not supported yet.
     // So we need to set them to default values.
     await this.setFieldValue("TEMP_UNITS", 0);
     await this.setFieldValue("NO_HEADER", 0);
   }
 
-  private async refreshRegisters() {
+  private async _refreshRegisters() {
     const commonNames = [
       "FRAME_MODE",
       "FW_VERSION_1",
@@ -232,7 +232,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return values;
   }
 
-  private validateWriteReg(addr: number, value: number) {
+  private _validateWriteReg(addr: number, value: number) {
     if (addr < 0 || addr > 0xff) {
       throw new SenxorError(`Invalid register address: ${addr}`);
     }
@@ -241,7 +241,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
   }
 
-  private validateSetFieldValue(field: FieldName, value: number) {
+  private _validateSetFieldValue(field: FieldName, value: number) {
     switch (field) {
       case "TEMP_UNITS":
         if (value !== 0) {
@@ -260,7 +260,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
   }
 
-  private handleTransportData(data: SenxorRawData) {
+  private _handleTransportData(data: SenxorRawData) {
     const senxorData = processRawSenxorData(data);
 
     try {
@@ -270,7 +270,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
   }
 
-  private handleTransportDisconnect() {
+  private _handleTransportDisconnect() {
     try {
       this.close();
     } finally {
@@ -278,7 +278,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
   }
 
-  private handleTransportError(error: SenxorTransportError) {
+  private _handleTransportError(error: SenxorTransportError) {
     this.errorListener?.(error);
   }
 }
