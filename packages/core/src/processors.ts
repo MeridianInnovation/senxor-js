@@ -1,5 +1,5 @@
-import type { SenxorData, SenxorHeader } from "./types";
 import colormapData from "./colormaps.json";
+import type { SenxorData, SenxorHeader } from "./types";
 
 export type senxorNormalizedData = {
   header?: SenxorHeader;
@@ -22,8 +22,8 @@ export const getMinMax = (
   let min = array[0];
   let max = array[0];
 
-  for (let i = 0; i < array.length; i++) {
-    const value = array[i];
+  for (const element of array) {
+    const value = element;
     if (value < min) min = value;
     if (value > max) max = value;
   }
@@ -153,12 +153,12 @@ export const applyColorLUT = (
   return new ImageData(rgbaData, width, height);
 };
 
-export type ColorMap = "rainbow2" | string;
+export type ColorMap = "rainbow2";
 
 /**
  * Color maps are stored in base64 format in colormaps.json
  */
-const colormaps: Record<ColorMap, Uint8Array | undefined> = {
+const colormaps: Record<string, Uint8Array | undefined> = {
   rainbow2: undefined,
 };
 
@@ -167,11 +167,14 @@ const colormaps: Record<ColorMap, Uint8Array | undefined> = {
  * @param name - Color map name
  * @param lut - Color map LUT
  */
-export const registerColorMap = (name: ColorMap, lut: Uint8Array): void => {
+export const registerColorMap = (name: string, lut: Uint8Array): void => {
+  if (lut.length !== 768) {
+    throw new Error(`Color map "${name}" must be a 256x3 Uint8Array`);
+  }
   colormaps[name] = lut;
 };
 
-const loadColorMap = (name: ColorMap): void => {
+const loadColorMap = (name: ColorMap | string): void => {
   if (!(name in colormapData)) {
     throw new Error(`Color map "${name}" not found`);
   }
@@ -203,7 +206,7 @@ export const getColorMapList = (): string[] => {
  */
 export const applyColorMap = (
   data: senxorNormalizedData,
-  map: ColorMap
+  map: ColorMap | string
 ): ImageData => {
   if (!(map in colormaps)) {
     throw new Error(`Color map "${map}" not found`);
