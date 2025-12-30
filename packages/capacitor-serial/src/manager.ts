@@ -8,6 +8,8 @@ import * as capacitorSerial from "serial-adaptor-capacitor";
  * Provides methods to list available devices, request device access, and listen for device connections.
  */
 export class SenxorManagerCapacitorSerial {
+  readonly platform = "capacitor";
+  readonly transport = "serial";
   /**
    * Lists all available Senxor devices that are currently connected.
    * @returns Promise resolving to an array of Senxor device instances
