@@ -90,25 +90,25 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return this.mutex.runExclusive(async () => {
       if (this._isOpen) return;
       await this.transport.open();
-      this._refreshRegisters().catch((error) => {
+      await this.stopStreaming();
+
+      try {
+        await this._refreshRegisters();
+      } catch (error) {
         console.warn(
           "Failed to refresh all registers. Some registers may be not available in this device. Error: ",
           error
         );
-      });
-      this._setUpSenxor().catch((error) => {
+      }
+
+      try {
+        await this._setUpSenxor();
+      } catch (error) {
         console.warn(
           "Failed to set up senxor. Some settings may be not available in this device. Error: ",
           error
         );
-      });
-      this.getFieldValue("CONTINUOUS_STREAM", false)
-        .then((isStreaming) => {
-          this._isStreaming = isStreaming === 1;
-        })
-        .catch((error) => {
-          console.warn("Failed to get continuous stream. Error: ", error);
-        });
+      }
 
       this._isOpen = true;
       this.openListener?.();
@@ -316,6 +316,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   }
 
   private _handleTransportData(data: SenxorRawData) {
+    if (!this._isOpen) return;
     const senxorData = processRawSenxorData(data);
 
     try {
