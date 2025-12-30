@@ -1,4 +1,5 @@
 import { Mutex } from "async-mutex";
+import { SENXOR_TYPE2FRAME_SHAPE } from "./consts";
 import { SenxorError, SenxorTransportError } from "./error";
 import type { FieldName } from "./fields";
 import { FIELDS } from "./fields";
@@ -45,6 +46,26 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   get registersCache() {
     return { ...this._registers };
+  }
+
+  get frameShape() {
+    const senxorType = this._fileds["SENXOR_TYPE"];
+    if (senxorType === undefined) {
+      console.warn(
+        "Failed to get frame shape. Open device and load fields first."
+      );
+      return undefined;
+    }
+    if (senxorType in SENXOR_TYPE2FRAME_SHAPE) {
+      return SENXOR_TYPE2FRAME_SHAPE[
+        senxorType as keyof typeof SENXOR_TYPE2FRAME_SHAPE
+      ];
+    }
+    console.warn(
+      "Failed to get frame shape. Unknown SENXOR_TYPE: ",
+      senxorType
+    );
+    return undefined;
   }
 
   async open() {
