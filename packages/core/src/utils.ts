@@ -3,6 +3,7 @@ import { SenxorError } from "./error";
 import type {
   DataUnit,
   SenxorData,
+  SenxorHeader,
   SenxorRawData,
 } from "./types";
 
@@ -86,6 +87,56 @@ export const getFrameShape = (
   return shape;
 };
 
+export const parseHeader = (
+  header: Uint8Array,
+  dataUnit: DataUnit
+): SenxorHeader => {
+  const view = new DataView(
+    header.buffer,
+    header.byteOffset,
+    header.byteLength
+  );
+  let offset = 0;
+
+  const frameCount = view.getUint16(offset, true);
+  offset += 2;
+
+  const vddRaw = view.getUint16(offset, true);
+  const vdd = vddRaw * 0.0001;
+  offset += 2;
+
+  const dieTempRaw = view.getUint16(offset, true);
+  const dieTempKelvin = dieTempRaw * 0.01;
+  const dieTemp = dataUnit === "C" ? dieTempKelvin - KELVIN : dieTempKelvin;
+
+  offset += 2;
+
+  const timestamp = view.getUint32(offset, true);
+  offset += 4;
+
+  const maxValDk = view.getUint16(offset, true);
+  const maxVal =
+    dataUnit === "C" ? dkToCelsius(maxValDk) : dkToKelvin(maxValDk);
+  offset += 2;
+
+  const minValDk = view.getUint16(offset, true);
+  const minVal =
+    dataUnit === "C" ? dkToCelsius(minValDk) : dkToKelvin(minValDk);
+  offset += 2;
+
+  const crc = view.getUint16(offset, true);
+
+  return {
+    frameCount,
+    vdd,
+    dieTemp,
+    timestamp,
+    maxVal,
+    minVal,
+    crc,
+  };
+};
+
 export const processRawSenxorData = (
   data: SenxorRawData,
   dataUnit: DataUnit
@@ -100,6 +151,7 @@ export const processRawSenxorData = (
 
   const header = data.header ? parseHeader(data.header, dataUnit) : undefined;
   return {
+    header,
     frame: celsiusFrame,
     width: shape.width,
     height: shape.height,

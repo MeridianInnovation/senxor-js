@@ -84,6 +84,9 @@
             <span id="tempRange">0°C - 50°C</span>
           </label>
         </div>
+        <div>
+          <label>Header: <span id="header">No header</span></label>
+        </div>
       </div>
       <div class="controls">
         <h3>Field Control</h3>
@@ -321,6 +324,18 @@
           ).textContent = `${this.minTemp.toFixed(
             1
           )}°C - ${this.maxTemp.toFixed(1)}°C`;
+          const header = data.header;
+          const headerObj = {
+            frameCount: header?.frameCount.toFixed(0),
+            vdd: header?.vdd.toFixed(4),
+            dieTemp: header?.dieTemp.toFixed(2),
+            timestamp: header?.timestamp.toFixed(0),
+            maxVal: header?.maxVal.toFixed(1),
+            minVal: header?.minVal.toFixed(1),
+            crc: header?.crc.toFixed(0),
+          }
+          const headerText = Object.entries(headerObj).map(([key, value]) => `${key}: ${value}`).join("\n");
+          document.getElementById("header").textContent = headerText;
         }
 
         drawTemperatureFrame(frame, width, height) {
