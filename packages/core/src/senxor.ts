@@ -4,7 +4,12 @@ import { SenxorError, SenxorTransportError } from "./error";
 import type { FieldName } from "./fields";
 import { FIELDS, REGISTER2FIELD } from "./fields";
 import { REGISTERS } from "./registers";
-import type { ISenxorTransport, SenxorData, SenxorRawData } from "./types";
+import type {
+  DataUnit,
+  ISenxorTransport,
+  SenxorData,
+  SenxorRawData,
+} from "./types";
 import { getBits, processRawSenxorData, setBits } from "./utils";
 
 export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
@@ -13,6 +18,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   private _fileds: Partial<Record<FieldName, number>> = {};
   private _isStreaming: boolean = false;
   private _isOpen: boolean = false;
+  private _dataUnit: DataUnit = "C";
 
   private readonly mutex: Mutex = new Mutex();
   private dataListener?: (data: SenxorData) => void;
@@ -46,6 +52,10 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   get registersCache() {
     return { ...this._registers };
+  }
+
+  get dataUnit() {
+    return this._dataUnit;
   }
 
   get frameShape() {
@@ -250,6 +260,10 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     this.disconnectListener = listener;
   }
 
+  setDataUnit(unit: DataUnit) {
+    this._dataUnit = unit;
+  }
+
   private async _setUpSenxor() {
     // Some settings are not supported yet.
     // So we need to set them to default values.
@@ -336,7 +350,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   private _handleTransportData(data: SenxorRawData) {
     if (!this._isOpen) return;
-    const senxorData = processRawSenxorData(data);
+    const senxorData = processRawSenxorData(data, this._dataUnit);
 
     try {
       this.dataListener?.(senxorData);

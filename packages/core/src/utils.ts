@@ -1,6 +1,10 @@
 import { KELVIN, SENXOR_FRAME_SHAPE } from "./consts";
-import type { SenxorRawData, SenxorData } from "./types";
 import { SenxorError } from "./error";
+import type {
+  DataUnit,
+  SenxorData,
+  SenxorRawData,
+} from "./types";
 
 export const getBits = (value: number, start: number, end: number) => {
   if (value < 0 || value > 0xffffffff) {
@@ -62,7 +66,11 @@ export const setBits = (
 };
 
 export const dkToCelsius = (dk: number): number => {
-  return dk / 10 - KELVIN;
+  return dk * 0.1 - KELVIN;
+};
+
+export const dkToKelvin = (dk: number): number => {
+  return dk * 0.1;
 };
 
 export const getFrameShape = (
@@ -78,15 +86,24 @@ export const getFrameShape = (
   return shape;
 };
 
-export const processRawSenxorData = (data: SenxorRawData): SenxorData => {
+export const processRawSenxorData = (
+  data: SenxorRawData,
+  dataUnit: DataUnit
+): SenxorData => {
   const raw = data.frame;
   const rawFrame = new Uint16Array(raw.buffer, raw.byteOffset, raw.length / 2);
   const shape = getFrameShape(rawFrame.length);
-  const celsiusFrame = Float32Array.from(rawFrame, dkToCelsius);
+  const celsiusFrame = Float32Array.from(
+    rawFrame,
+    dataUnit === "C" ? dkToCelsius : dkToKelvin
+  );
+
+  const header = data.header ? parseHeader(data.header, dataUnit) : undefined;
   return {
     frame: celsiusFrame,
     width: shape.width,
     height: shape.height,
     timestamp: data.timestamp,
+    dataUnit,
   };
 };
