@@ -288,8 +288,12 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       );
       return register!.addr;
     });
-    const values = await this.readRegs(addresses);
-    return values;
+    const results: Record<number, number> = {};
+    for (const addr of addresses) {
+      // Using single readReg per address
+      results[addr] = await this.readReg(addr);
+    }
+    return results;
   }
 
   private _refreshField(regAddr: number, regValue: number) {
