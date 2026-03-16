@@ -1,7 +1,7 @@
 {
   "name": "@senxor/serial-core",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "description": "Shared serial transport core for Senxor JavaScript SDK.",
   "author": "Shui <zelongshui@meridianinno.com>",
   "license": "Apache-2.0",
