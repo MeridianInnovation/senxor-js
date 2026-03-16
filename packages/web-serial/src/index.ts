@@ -1,2 +1,5 @@
-export { isSenxorDevice, SerialTransportBase } from "@senxor/serial-core";
-export { SenxorManagerWebSerial } from "./manager";
+export {
+  listWebSerialSenxors,
+  onWebSerialSenxorConnect,
+  requestWebSerialSenxor,
+} from "./api";
