@@ -41,3 +41,5 @@ export interface ISenxorTransport {
   onClose(listener: () => void): void;
   onDisconnect(listener: () => void): void;
 }
+
+export type SenxorModuleName = "Cougar" | "Panther" | "Cheetah";
