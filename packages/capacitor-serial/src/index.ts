@@ -1,1 +1,4 @@
-export { SenxorManagerCapacitorSerial } from "./manager";
+export {
+  listCapacitorSerialSenxors,
+  onCapacitorSerialSenxorConnect,
+} from "./api";

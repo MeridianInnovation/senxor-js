@@ -1,9 +1,11 @@
-import { SenxorManagerCapacitorSerial } from "@senxor/capacitor-serial";
+import {
+  listCapacitorSerialSenxors,
+  onCapacitorSerialSenxorConnect,
+} from "@senxor/capacitor-serial";
 import { FIELDS } from "@senxor/core";
 
 class SenxorDemo {
   constructor() {
-    this.manager = new SenxorManagerCapacitorSerial();
     this.device = null;
     this.canvas = document.getElementById("tempCanvas");
     this.ctx = this.canvas.getContext("2d");
@@ -41,7 +43,7 @@ class SenxorDemo {
   }
 
   initDeviceListener() {
-    this.manager.onDeviceConnect((device) => {
+    onCapacitorSerialSenxorConnect((device) => {
       this.showStatus(
         `New device connected: ${JSON.stringify(device.deviceInfo)}`,
         "success"
@@ -63,7 +65,7 @@ class SenxorDemo {
 
   async listDevices() {
     try {
-      const devices = await this.manager.listDevices();
+      const devices = await listCapacitorSerialSenxors();
       if (devices.length === 0) {
         this.showStatus("No Senxor devices found", "error");
       } else {
