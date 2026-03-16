@@ -1,11 +1,6 @@
 import { KELVIN, SENXOR_FRAME_SHAPE } from "./consts";
 import { SenxorError } from "./error";
-import type {
-  DataUnit,
-  SenxorData,
-  SenxorHeader,
-  SenxorRawData,
-} from "./types";
+import type { SenxorData, SenxorHeader, SenxorRawData } from "./types";
 
 export const getBits = (value: number, start: number, end: number) => {
   if (value < 0 || value > 0xffffffff) {
@@ -38,14 +33,14 @@ export const setBits = (
   value: number,
   start: number,
   end: number,
-  newBits: number
+  newBits: number,
 ) => {
   if (value < 0 || value > 0xffffffff || newBits < 0) {
     throw new Error("Values must be valid 32-bit unsigned integers");
   }
   if (start < 0 || end > 31 || start > end) {
     throw new Error(
-      "Start and end indices must be between 0 and 31, start <= end"
+      "Start and end indices must be between 0 and 31, start <= end",
     );
   }
 
@@ -70,31 +65,24 @@ export const dkToCelsius = (dk: number): number => {
   return dk * 0.1 - KELVIN;
 };
 
-export const dkToKelvin = (dk: number): number => {
-  return dk * 0.1;
-};
-
 export const getFrameShape = (
-  frameLength: number
+  frameLength: number,
 ): { width: number; height: number } => {
   const shape =
     SENXOR_FRAME_SHAPE[frameLength as keyof typeof SENXOR_FRAME_SHAPE];
   if (!shape) {
     throw new SenxorError(
-      `Parse Senxor Data Error: Unknown frame shape for length: ${frameLength}`
+      `Parse Senxor Data Error: Unknown frame shape for length: ${frameLength}`,
     );
   }
   return shape;
 };
 
-export const parseHeader = (
-  header: Uint8Array,
-  dataUnit: DataUnit
-): SenxorHeader => {
+export const parseHeader = (header: Uint8Array): SenxorHeader => {
   const view = new DataView(
     header.buffer,
     header.byteOffset,
-    header.byteLength
+    header.byteLength,
   );
   let offset = 0;
 
@@ -107,7 +95,7 @@ export const parseHeader = (
 
   const dieTempRaw = view.getUint16(offset, true);
   const dieTempKelvin = dieTempRaw * 0.01;
-  const dieTemp = dataUnit === "C" ? dieTempKelvin - KELVIN : dieTempKelvin;
+  const dieTemp = dieTempKelvin - KELVIN;
 
   offset += 2;
 
@@ -115,13 +103,11 @@ export const parseHeader = (
   offset += 4;
 
   const maxValDk = view.getUint16(offset, true);
-  const maxVal =
-    dataUnit === "C" ? dkToCelsius(maxValDk) : dkToKelvin(maxValDk);
+  const maxVal = dkToCelsius(maxValDk);
   offset += 2;
 
   const minValDk = view.getUint16(offset, true);
-  const minVal =
-    dataUnit === "C" ? dkToCelsius(minValDk) : dkToKelvin(minValDk);
+  const minVal = dkToCelsius(minValDk);
   offset += 2;
 
   const crc = view.getUint16(offset, true);
@@ -137,25 +123,18 @@ export const parseHeader = (
   };
 };
 
-export const processRawSenxorData = (
-  data: SenxorRawData,
-  dataUnit: DataUnit
-): SenxorData => {
+export const processRawSenxorData = (data: SenxorRawData): SenxorData => {
   const raw = data.frame;
   const rawFrame = new Uint16Array(raw.buffer, raw.byteOffset, raw.length / 2);
   const shape = getFrameShape(rawFrame.length);
-  const celsiusFrame = Float32Array.from(
-    rawFrame,
-    dataUnit === "C" ? dkToCelsius : dkToKelvin
-  );
+  const celsiusFrame = Float32Array.from(rawFrame, dkToCelsius);
 
-  const header = data.header ? parseHeader(data.header, dataUnit) : undefined;
+  const header = data.header ? parseHeader(data.header) : undefined;
   return {
     header,
     frame: celsiusFrame,
     width: shape.width,
     height: shape.height,
     timestamp: data.timestamp,
-    dataUnit,
   };
 };

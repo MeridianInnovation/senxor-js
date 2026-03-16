@@ -10,8 +10,6 @@ export type SenxorHeader = {
   crc: number;
 };
 
-export type DataUnit = "C" | "K";
-
 export type SenxorRawData = {
   header?: Uint8Array;
   frame: Uint8Array;
@@ -24,7 +22,6 @@ export type SenxorData = {
   width: number;
   height: number;
   timestamp: number;
-  dataUnit: DataUnit;
 };
 
 export interface ISenxorTransport {

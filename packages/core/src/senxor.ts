@@ -4,12 +4,7 @@ import { SenxorError, SenxorTransportError } from "./error";
 import type { FieldName } from "./fields";
 import { FIELDS, REGISTER2FIELD } from "./fields";
 import { REGISTERS } from "./registers";
-import type {
-  DataUnit,
-  ISenxorTransport,
-  SenxorData,
-  SenxorRawData,
-} from "./types";
+import type { ISenxorTransport, SenxorData, SenxorRawData } from "./types";
 import { getBits, processRawSenxorData, setBits } from "./utils";
 
 export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
@@ -18,7 +13,6 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   private _fileds: Partial<Record<FieldName, number>> = {};
   private _isStreaming: boolean = false;
   private _isOpen: boolean = false;
-  private _dataUnit: DataUnit = "C";
 
   private readonly mutex: Mutex = new Mutex();
   private dataListener?: (data: SenxorData) => void;
@@ -54,15 +48,11 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     return { ...this._registers };
   }
 
-  get dataUnit() {
-    return this._dataUnit;
-  }
-
   get frameShape() {
     const senxorType = this._fileds["SENXOR_TYPE"];
     if (senxorType === undefined) {
       console.warn(
-        "Failed to get frame shape. Open device and load fields first."
+        "Failed to get frame shape. Open device and load fields first.",
       );
       return undefined;
     }
@@ -73,7 +63,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
     console.warn(
       "Failed to get frame shape. Unknown SENXOR_TYPE: ",
-      senxorType
+      senxorType,
     );
     return undefined;
   }
@@ -82,7 +72,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     const moduleType = this._fileds["MODULE_TYPE"];
     if (moduleType === undefined) {
       console.warn(
-        "Failed to get module type. Open device and load fields first."
+        "Failed to get module type. Open device and load fields first.",
       );
       return undefined;
     }
@@ -91,7 +81,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
     console.warn(
       "Failed to get module type. Unknown MODULE_TYPE: ",
-      moduleType
+      moduleType,
     );
     return undefined;
   }
@@ -107,7 +97,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       } catch (error) {
         console.warn(
           "Failed to refresh all registers. Some registers may be not available in this device. Error: ",
-          error
+          error,
         );
       }
 
@@ -116,7 +106,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       } catch (error) {
         console.warn(
           "Failed to set up senxor. Some settings may be not available in this device. Error: ",
-          error
+          error,
         );
       }
 
@@ -155,7 +145,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       const addressHex = address.toString(16).padStart(2, "0");
       const registerName = REGISTERS[address].name;
       throw new SenxorError(
-        `Failed to read register 0x${addressHex} (${registerName}): ${error}`
+        `Failed to read register 0x${addressHex} (${registerName}): ${error}`,
       );
     }
   }
@@ -183,7 +173,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       const addressHex = address.toString(16).padStart(2, "0");
       const registerName = REGISTERS[address].name;
       throw new SenxorError(
-        `Failed to write register 0x${addressHex} (${registerName}). Error: ${error}`
+        `Failed to write register 0x${addressHex} (${registerName}). Error: ${error}`,
       );
     }
   }
@@ -203,7 +193,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       const fieldValue = getBits(
         regValue,
         fieldInfo.startBit,
-        fieldInfo.endBit
+        fieldInfo.endBit,
       );
       this._fileds[field] = fieldValue;
       return fieldValue;
@@ -231,7 +221,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
         regValue,
         fieldInfo.startBit,
         fieldInfo.endBit,
-        value
+        value,
       );
       await this.writeReg(fieldInfo.addr, newRegValue);
       this._fileds[field] = value;
@@ -258,10 +248,6 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   onDisconnect(listener: () => void) {
     this.disconnectListener = listener;
-  }
-
-  setDataUnit(unit: DataUnit) {
-    this._dataUnit = unit;
   }
 
   private async _setUpSenxor() {
@@ -298,7 +284,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
     const addresses = commonNames.map((name) => {
       const register = Object.values(REGISTERS).find(
-        (reg) => reg.name === name
+        (reg) => reg.name === name,
       );
       return register!.addr;
     });
@@ -314,7 +300,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       const fieldValue = getBits(
         regValue,
         fieldInfo.startBit,
-        fieldInfo.endBit
+        fieldInfo.endBit,
       );
       this._fileds[field] = fieldValue;
     });
@@ -334,7 +320,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       case "TEMP_UNITS":
         if (value !== 0) {
           throw new SenxorError(
-            `TEMP_UNITS is not supported yet in senxor.js.`
+            `TEMP_UNITS is not supported yet in senxor.js.`,
           );
         }
         break;
@@ -350,7 +336,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   private _handleTransportData(data: SenxorRawData) {
     if (!this._isOpen) return;
-    const senxorData = processRawSenxorData(data, this._dataUnit);
+    const senxorData = processRawSenxorData(data);
 
     try {
       this.dataListener?.(senxorData);
