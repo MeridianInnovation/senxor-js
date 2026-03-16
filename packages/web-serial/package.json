@@ -30,9 +30,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "async-mutex": "^0.5.0",
     "@senxor/core": "workspace:*",
-    "serial-packet-parser": "latest",
+    "@senxor/serial-core": "workspace:*",
     "serial-adaptor-web": "latest"
   },
   "publishConfig": {

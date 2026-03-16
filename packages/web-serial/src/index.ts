@@ -1,3 +1,2 @@
+export { isSenxorDevice, SerialTransportBase } from "@senxor/serial-core";
 export { SenxorManagerWebSerial } from "./manager";
-export { SerialTransportBase } from "./transports";
-export { isSenxorDevice } from "./utils";

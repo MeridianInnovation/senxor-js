@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@senxor/core": "workspace:*",
-    "@senxor/web-serial": "workspace:*",
+    "@senxor/serial-core": "workspace:*",
     "serial-adaptor-capacitor": "latest"
   },
   "peerDependencies": {

@@ -1,9 +1,8 @@
-import * as webSerial from "serial-adaptor-web";
 import type { SerialFilter, WebSerialPort } from "serial-adaptor-web";
+import * as webSerial from "serial-adaptor-web";
 
-import { SerialTransportBase } from "./transports";
-import { isSenxorDevice } from "./utils";
 import { consts, Senxor } from "@senxor/core";
+import { isSenxorDevice, SerialTransportBase } from "@senxor/serial-core";
 
 /**
  * Manages discovery and connection of Senxor devices using the Web Serial API.
@@ -20,10 +19,10 @@ export class SenxorManagerWebSerial {
     const ports = await webSerial.listDevices();
     const senxorPorts = ports.filter((port) => isSenxorDevice(port.deviceInfo));
     const senxorTransports = senxorPorts.map(
-      (port) => new SerialTransportBase<WebSerialPort>(port)
+      (port) => new SerialTransportBase<WebSerialPort>(port),
     );
     const senxorDevices = senxorTransports.map(
-      (transport) => new Senxor(transport)
+      (transport) => new Senxor(transport),
     );
     return senxorDevices;
   }
@@ -37,7 +36,7 @@ export class SenxorManagerWebSerial {
       (pid) => ({
         vendorId: consts.SENXOR_VENDOR_ID,
         productId: parseInt(pid, 10),
-      })
+      }),
     );
     const port = await webSerial.requestDevice(filters);
     if (!port) {
@@ -59,7 +58,7 @@ export class SenxorManagerWebSerial {
    * @returns Cleanup function to remove the event listener
    */
   async onDeviceConnect(
-    listener: (device: Senxor<SerialTransportBase<WebSerialPort>>) => void
+    listener: (device: Senxor<SerialTransportBase<WebSerialPort>>) => void,
   ) {
     const cleanup = webSerial.onDeviceConnect((port) => {
       if (isSenxorDevice(port.deviceInfo)) {

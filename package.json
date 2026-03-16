@@ -34,6 +34,7 @@
     "vitest": "^4.0.7",
     "@senxor/core": "workspace:*",
     "@senxor/web-serial": "workspace:*",
-    "@senxor/capacitor-serial": "workspace:*"
+    "@senxor/capacitor-serial": "workspace:*",
+    "@senxor/serial-core": "workspace:*"
   }
 }
