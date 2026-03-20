@@ -131,13 +131,7 @@ import { listCapacitorSerialSenxors } from "@senxor/capacitor-serial";
 const devices = await listCapacitorSerialSenxors();
 ```
 
-Lists all currently available Senxor devices exposed by the Capacitor serial plugin. It:
-
-- Asks the underlying `serial-adaptor-capacitor` to list connected serial ports.
-- Filters out non-Senxor devices.
-- Wraps each Senxor-compatible port in a serial transport and returns an array of `Senxor` instances.
-
-Use this at startup or when you want to refresh the list of connected devices.
+Returns an array of `Senxor` instances for Senxor devices the native serial layer currently reports as connected. Use this at app startup or whenever you want to refresh the device list. Call `open()` on each instance when you are ready to talk to the device.
 
 ### `onCapacitorSerialSenxorConnect(listener)`
 
@@ -152,9 +146,7 @@ const unsubscribe = onCapacitorSerialSenxorConnect((senxor) => {
 unsubscribe();
 ```
 
-Registers a listener that is called whenever a new Senxor device is connected and detected by the Capacitor serial plugin. The listener receives a `Senxor` instance that you can open and start streaming from.
-
-The function returns an unsubscribe callback that removes the listener when called.
+Registers a listener that runs when a new compatible Senxor device is attached while your app is running. The listener receives a `Senxor` instance you can `open()` and stream from. Returns an unsubscribe function that removes the listener.
 
 ## Working with @senxor/core
 

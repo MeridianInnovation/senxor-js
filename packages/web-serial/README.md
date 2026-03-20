@@ -67,13 +67,7 @@ import { listWebSerialSenxors } from "@senxor/web-serial";
 const devices = await listWebSerialSenxors();
 ```
 
-Lists all Senxor devices that the browser has already been granted access to. It:
-
-- Calls the underlying Web Serial adapter to list available ports.
-- Filters out non-Senxor devices.
-- Wraps each port in a transport and returns an array of `Senxor` instances.
-
-This is useful when you want to restore previously authorized devices on application startup without prompting the user again.
+Returns an array of `Senxor` instances for Senxor serial ports this page already has permission to use (for example, devices the user picked in an earlier session). No device picker is shown. Typical use is to reconnect on startup without asking for access again; call `open()` on each instance when you are ready to talk to the device.
 
 ### `requestWebSerialSenxor()`
 
@@ -86,18 +80,7 @@ if (!senxor) {
 }
 ```
 
-Opens the browser's device picker with filters preconfigured for Senxor devices. It:
-
-- Requests a serial device using Senxor-specific vendor and product IDs.
-- Validates that the selected device is a Senxor device.
-- Creates a transport and returns a `Senxor` instance bound to that device.
-
-Returns:
-
-- A `Senxor` instance when the user selects a compatible device.
-- `null` when the user cancels the picker.
-
-This is the recommended entry point for most applications.
+Opens the browser's device picker limited to Senxor devices. Returns a `Senxor` bound to the chosen port, or `null` if the user cancels. This is the recommended entry point for most applications.
 
 ### `onWebSerialSenxorConnect(listener)`
 
