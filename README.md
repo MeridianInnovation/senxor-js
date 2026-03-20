@@ -126,3 +126,7 @@ pnpm test --filter @senxor/core
 - For browser-based usage: see `packages/web-serial/README.md`.
 - For Capacitor-based usage: see `packages/capacitor-serial/README.md`.
 - For implementing custom transports: see `packages/serial-core/README.md`.
+
+## License
+
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
