@@ -19,7 +19,8 @@
     "test": "pnpm vitest",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint packages/*/src/**",
-    "release": "pnpm -r release"
+    "publish": "pnpm -r publish",
+    "pack": "pnpm -r pack"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
