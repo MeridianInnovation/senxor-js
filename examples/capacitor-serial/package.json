@@ -14,10 +14,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/core": "latest",
     "@capacitor/android": "latest",
-    "@senxor/core": "workspace:*",
-    "@senxor/capacitor-serial": "workspace:*"
+    "@capacitor/core": "latest",
+    "@senxor/capacitor-serial": "workspace:*",
+    "@senxor/core": "workspace:*"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",

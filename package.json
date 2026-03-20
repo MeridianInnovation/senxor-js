@@ -23,18 +23,19 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.0",
-    "bumpp": "^10.3.1",
+    "@senxor/capacitor-serial": "workspace:*",
+    "@senxor/core": "workspace:*",
+    "@senxor/serial-core": "workspace:*",
+    "@senxor/web-serial": "workspace:*",
+    "@types/node": "^25.3.5",
+    "bumpp": "^10.4.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
-    "tsdown": "^0.16.0",
+    "tsdown": "^0.21.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3",
-    "vitest": "^4.0.7",
-    "@senxor/core": "workspace:*",
-    "@senxor/web-serial": "workspace:*",
-    "@senxor/capacitor-serial": "workspace:*",
-    "@senxor/serial-core": "workspace:*"
-  }
+    "vitest": "^4.0.18"
+  },
+  "packageManager": "pnpm@10.15.0"
 }
