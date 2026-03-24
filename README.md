@@ -8,6 +8,8 @@ It provides a small set of packages that separate core protocol and processing l
 - `@senxor/capacitor-serial`: transport for Capacitor apps (for example, Android).
 - `@senxor/serial-core`: internal/shared serial transport core for building new transports.
 
+GitHub: https://github.com/MeridianInnovation/senxor-js
+
 ## Packages Overview
 
 ### `@senxor/core`
@@ -18,7 +20,7 @@ Core SDK that defines:
 - Processing helpers (processors) for working with Senxor data.
 - Error types and utilities.
 
-You normally use this together with one of the transport packages (Web Serial or Capacitor). See the `@senxor/core` README for details on the `Senxor` API, processors, and error handling.
+You normally use this together with one of the transport packages (Web Serial or Capacitor). See the `@senxor/core` [README](packages/core/README.md) for details on the `Senxor` API, processors, and error handling.
 
 ### `@senxor/web-serial`
 
@@ -32,7 +34,7 @@ Typical usage:
 1. Install `@senxor/core` and `@senxor/web-serial`.
 2. Use `@senxor/web-serial` to request and select a Senxor device and then use the `Senxor` instance it gives you.
 
-See the `@senxor/web-serial` README for concrete usage examples and environment requirements.
+See the `@senxor/web-serial` [README](packages/web-serial/README.md) for concrete usage examples and environment requirements.
 
 ### `@senxor/capacitor-serial`
 
@@ -41,7 +43,7 @@ Transport for Capacitor apps, for example an Android app using a WebView.
 - Relies on a Capacitor serial plugin to access serial ports from the native side.
 - Exposes helpers to list and connect to Senxor devices from your Capacitor app and gives you a `Senxor` instance for each connection.
 
-See the `@senxor/capacitor-serial` README for setup steps in a Capacitor project and usage examples.
+See the `@senxor/capacitor-serial` [README](packages/capacitor-serial/README.md) for setup steps in a Capacitor project and usage examples.
 
 ### `@senxor/serial-core` (internal / advanced)
 
@@ -50,7 +52,7 @@ Shared, environment-agnostic serial transport core used by both Web Serial and C
 - Provides abstractions like `SerialTransportBase`, `ISerialPort`, and shared types/utilities for Senxor serial communication.
 - Intended for advanced users who want to implement custom transports, for example for Node.js or custom gateways.
 
-Most end users do not need to depend on this package directly. See the `@senxor/serial-core` README if you are building a new transport.
+Most end users do not need to depend on this package directly. See the `@senxor/serial-core` [README](packages/serial-core/README.md) if you are building a new transport.
 
 ## Installation
 
