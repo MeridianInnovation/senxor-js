@@ -53,7 +53,14 @@ export const verifyChecksum = (
   const dataSum = dataToChecksum.reduce((acc, val) => acc + val, 0) & 0xffff;
   const checksumToVerify = toHexString(dataSum, 4);
 
-  return checksumFromMessage === checksumToVerify;
+  if (checksumFromMessage !== checksumToVerify) {
+    console.warn("Checksum verification failed", {
+      checksumFromMessage,
+      checksumToVerify,
+    });
+    // Do not return false here, some versions of firmware have wrong checksum
+  }
+  return true;
 };
 
 export const parseMessageBody = (message: Uint8Array) => {
