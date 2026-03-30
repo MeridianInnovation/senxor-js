@@ -77,6 +77,21 @@ Inside your main activity, you can also declare an intent filter and metadata fo
 
 The exact requirements may vary depending on the version of `capacitor-serial-plugin`. Always refer to that plugin's documentation for the most up-to-date Android configuration details and sample `device_filter` definitions.
 
+### Capacitor Configuration
+
+In your Capacitor configuration file (for example, `capacitor.config.ts`), you need to configure the `UsbSerial` plugin to use the correct data encoding and buffer size. For example:
+
+```ts
+export default {
+  plugins: {
+    UsbSerial: {
+      dataEncoding: "base64",
+      dataBufferSize: 8192,
+    },
+  },
+};
+```
+
 ## Quick start
 
 Once your Capacitor project is configured and the native plugin is installed, you can use `@senxor/capacitor-serial` from your web code to discover Senxor devices and work with `Senxor` instances.
@@ -167,4 +182,3 @@ This repository includes a Capacitor example application that demonstrates how t
 - Discover and stream from Senxor devices inside a Capacitor WebView.
 
 Look for the `examples/capacitor-serial` directory in the Senxor.js repository for a complete, runnable example built on top of `@senxor/capacitor-serial` and `@senxor/core`.
-
