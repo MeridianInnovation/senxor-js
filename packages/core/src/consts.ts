@@ -17,23 +17,29 @@ export const SENXOR_FRAME_SHAPE = {
 };
 
 export const SENXOR_TYPE = {
-  0: "MI0801-non-MP",
-  1: "MI0801",
-  2: "MI0802",
-  4: "MI0802-Rev1",
-  5: "MI0802-Rev2",
-  6: "MI16XX-Rev1",
+  0: "MI0801 non-MP", // non-MP modules
+  1: "MI0801", // MP modules
+  4: "MI0802", // cougar 80x62
+  5: "MI0802", // cougar 80x62
+  6: "MI1602", // panther 120x160
+  8: "MI0802", // cougar 80x62, high sensitivity
+  9: "MI0502", // Cheetah 50x50
 };
 
 export const MODULE_TYPE = {
-  19: "MI0802M5S",
-  20: "MI0802M6S",
-  21: "MI0802M7G",
-  22: "MI080250",
-  24: "MI0802M230",
-  25: "MI0802M231",
-  26: "MI0802M232",
-  27: "MI0802M233",
+  19: "MI0802-M5S",
+  20: "MI0802-M6S",
+  21: "MI0802-M7G",
+  22: "MI0802-50",
+  24: "MI0802-M230", // M230-022
+  28: "MI1602-M5S",
+  29: "MI1602-M6C",
+  40: "MI1602-M5S", // Panther engineering sample
+  41: "MI1602-M6C", // Panther engineering sample
+  50: "MI0502-M230F", // Cheetah WFOV, FPC
+  255: "MI0801", // Bobcat FW does not have this register; read returns 0xFF
+  42: "MI1602-Z6C", // Panther MP, Zn-Alloy LHA
+  0: "MI0505-M240", // Cheetah, WFOV, FPC
 };
 
 export const SENXOR_TYPE2FRAME_SHAPE = {
@@ -46,12 +52,12 @@ export const SENXOR_TYPE2FRAME_SHAPE = {
   8: { height: 62, width: 80 },
   9: { height: 50, width: 50 },
 };
-
 export const MCU_TYPE = {
-  0: "MI48D4",
-  1: "MI48D5",
-  2: "MI48E",
-  3: "MI48G",
-  4: "MI48C",
-  255: "MI48D4",
+  0: "MI48D4", // MI48, Cougar
+  1: "MI48D5", // MI48, Panther
+  2: "MI48E", // MI467, Panther
+  3: "MI48G", // GPM4, Panther
+  4: "MI49", // CCore 4201, Cougar, Cheetah
+  5: "MI40", // CCore 4001, Cougar, Cheetah
+  255: "MI48D4", // MI48, Cougar (older FW has 0x33 Reserved, returning 255)
 };
