@@ -35,10 +35,9 @@ export class CommandSender<TPort extends ISerialPort> {
 
   resolveAck<K extends keyof SenxorCommand>(type: K, data: SenxorAck[K]): void {
     if (!this.pendingCommand) {
-      const err = new SenxorTransportError(
+      console.warn(
         `Bare ACK received: ${type} without a corresponding command`,
       );
-      this.errorListener?.(err);
       return;
     }
 
