@@ -43,6 +43,7 @@
     }
   },
   "dependencies": {
+    "@senxor/core": "workspace:*",
     "async-mutex": "^0.5.0",
     "serial-packet-parser": "latest"
   }
