@@ -23,6 +23,9 @@ importers:
       '@senxor/web-serial':
         specifier: workspace:*
         version: link:packages/web-serial
+      '@senxor/websocket-serial':
+        specifier: workspace:*
+        version: link:packages/websocket-serial
       '@types/node':
         specifier: ^25.3.5
         version: 25.5.0
@@ -74,6 +77,9 @@ importers:
 
   packages/serial-core:
     dependencies:
+      '@senxor/core':
+        specifier: workspace:*
+        version: link:../core
       async-mutex:
         specifier: ^0.5.0
         version: 0.5.0
@@ -100,6 +106,15 @@ importers:
         specifier: ^4.0.18
         version: 4.1.0(@types/node@25.5.0)(vite@7.2.0(@types/node@25.5.0)(jiti@2.6.1)(yaml@2.8.2))
 
+  packages/tcpip-serial-node:
+    dependencies:
+      '@senxor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@senxor/serial-core':
+        specifier: workspace:*
+        version: link:../serial-core
+
   packages/web-serial:
     dependencies:
       '@senxor/core':
@@ -111,6 +126,15 @@ importers:
       serial-adaptor-web:
         specifier: latest
         version: 2.0.2
+
+  packages/websocket-serial:
+    dependencies:
+      '@senxor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@senxor/serial-core':
+        specifier: workspace:*
+        version: link:../serial-core
 
 packages:
 
