@@ -78,6 +78,8 @@ This repository is a pnpm workspace:
 - `packages/core` – `@senxor/core`
 - `packages/web-serial` – `@senxor/web-serial`
 - `packages/capacitor-serial` – `@senxor/capacitor-serial`
+- `packages/tcpip-serial-node` – `@senxor/tcpip-serial-node`
+- `packages/websocket-serial` – `@senxor/websocket-serial`
 - `packages/serial-core` – `@senxor/serial-core`
 - `examples/web-serial` – Vite example app using `@senxor/web-serial`
 - `examples/capacitor-serial` – Vite plus Capacitor example app using `@senxor/capacitor-serial`

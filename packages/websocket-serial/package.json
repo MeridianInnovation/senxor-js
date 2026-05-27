@@ -33,6 +33,7 @@
     "@senxor/serial-core": "workspace:*"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./package.json": "./package.json"
