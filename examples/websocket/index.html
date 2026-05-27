@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Senxor WebSocket Preview</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: end;
+        margin-bottom: 12px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        gap: 4px;
+      }
+      input {
+        padding: 6px 8px;
+        font-size: 14px;
+      }
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      #status {
+        margin-bottom: 12px;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Senxor WebSocket Preview</h1>
+    <p id="status">Disconnected</p>
+    <div class="row">
+      <label>
+        Host
+        <input id="host" value="" />
+      </label>
+      <label>
+        Port
+        <input id="port" type="number" placeholder="default" />
+      </label>
+      <label>
+        Path
+        <input id="path" value="/ws" />
+      </label>
+      <label>
+        Secure
+        <input id="secure" type="checkbox" value="false" />
+      </label>
+      <button id="connectBtn">Connect</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+    </div>
+    <canvas id="canvas" width="320" height="240"></canvas>
+
+    <script type="module">
+      import { createWebsocketSerialSenxor } from "@senxor/websocket-serial";
+
+      const hostInput = document.getElementById("host");
+      const portInput = document.getElementById("port");
+      const pathInput = document.getElementById("path");
+      const secureInput = document.getElementById("secure");
+      const connectBtn = document.getElementById("connectBtn");
+      const disconnectBtn = document.getElementById("disconnectBtn");
+      const statusEl = document.getElementById("status");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      let senxor = null;
+      let minTemp = 0;
+      let maxTemp = 50;
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function setConnected(connected) {
+        connectBtn.disabled = connected;
+        disconnectBtn.disabled = !connected;
+        hostInput.disabled = connected;
+        portInput.disabled = connected;
+        pathInput.disabled = connected;
+      }
+
+      function drawFrame(frame, width, height) {
+        const temps = Array.from(frame);
+        minTemp = Math.min(...temps);
+        maxTemp = Math.max(...temps);
+        const range = maxTemp - minTemp || 1;
+
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+        for (let i = 0; i < frame.length; i++) {
+          const gray = Math.max(
+            0,
+            Math.min(255, ((frame[i] - minTemp) / range) * 255),
+          );
+          const p = i * 4;
+          data[p] = gray;
+          data[p + 1] = gray;
+          data[p + 2] = gray;
+          data[p + 3] = 255;
+        }
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      }
+
+      connectBtn.addEventListener("click", async () => {
+        const host = hostInput.value.trim();
+        if (!host) {
+          setStatus("Host required");
+          return;
+        }
+
+        const portStr = portInput.value.trim();
+        const port = portStr ? parseInt(portStr, 10) : undefined;
+        const path = pathInput.value.trim() || "/ws";
+
+        try {
+          setStatus("Connecting...");
+          senxor = createWebsocketSerialSenxor(host, port, path, secureInput.checked);
+          senxor.onData((data) => drawFrame(data.frame, data.width, data.height));
+          senxor.onError((err) => setStatus(`Error: ${err.message}`));
+          senxor.onDisconnect(() => {
+            setStatus("Disconnected");
+            setConnected(false);
+            senxor = null;
+          });
+
+          await senxor.open();
+          await senxor.startStreaming();
+          setStatus("Connected");
+          setConnected(true);
+        } catch (err) {
+          setStatus(`Failed: ${err.message}`);
+          senxor = null;
+          setConnected(false);
+        }
+      });
+
+      disconnectBtn.addEventListener("click", async () => {
+        if (!senxor) return;
+        try {
+          await senxor.stopStreaming();
+          await senxor.close();
+        } catch (err) {
+          setStatus(`Failed: ${err.message}`);
+        }
+        senxor = null;
+        setStatus("Disconnected");
+        setConnected(false);
+      });
+    </script>
+  </body>
+</html>
