@@ -120,6 +120,7 @@ export class ByteTransport<TPort extends IBytePort>
         this.commandSender.resolveAck("RREG", regValue);
         break;
       }
+      case "WRGE":
       case "WREG": {
         const wregResult = senxorAckDecoder.WREG(data);
         this.commandSender.resolveAck("WREG", wregResult);
