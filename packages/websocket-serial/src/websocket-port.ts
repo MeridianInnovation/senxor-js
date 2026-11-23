@@ -172,7 +172,7 @@ export class WebsocketPort implements IBytePort<WebsocketSerialDeviceInfo> {
   }
 
   private handleWebSocketDisconnect(): void {
-    if (this.hasEmittedDisconnect) {
+    if (this.isClosing || this.hasEmittedDisconnect) {
       return;
     }
 

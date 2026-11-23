@@ -138,7 +138,7 @@ export class TcpSocketPort implements IBytePort<TcpIpSerialDeviceInfo> {
   }
 
   private handleSocketDisconnect(): void {
-    if (this.hasEmittedDisconnect) {
+    if (this.isClosing || this.hasEmittedDisconnect) {
       return;
     }
 
