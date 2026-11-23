@@ -16,9 +16,9 @@ export type SenxorRawData = {
   timestamp: number;
 };
 
-export type SenxorData = {
+export type SenxorData<TFrame extends Float32Array | Uint16Array = Float32Array> = {
   header?: SenxorHeader;
-  frame: Float32Array;
+  frame: TFrame;
   width: number;
   height: number;
   timestamp: number;

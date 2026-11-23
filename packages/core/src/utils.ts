@@ -123,18 +123,20 @@ export const parseHeader = (header: Uint8Array): SenxorHeader => {
   };
 };
 
-export const processRawSenxorData = (data: SenxorRawData): SenxorData => {
+export function processRawSenxorData(data: SenxorRawData, unit?: "C"): SenxorData;
+export function processRawSenxorData(data: SenxorRawData, unit: "dK"): SenxorData<Uint16Array>;
+export function processRawSenxorData(data: SenxorRawData, unit: "C" | "dK" = "C"): SenxorData<Float32Array | Uint16Array> {
   const raw = data.frame;
   const rawFrame = new Uint16Array(raw.buffer, raw.byteOffset, raw.length / 2);
   const shape = getFrameShape(rawFrame.length);
-  const celsiusFrame = Float32Array.from(rawFrame, dkToCelsius);
+  const frame = unit === "dK" ? rawFrame : Float32Array.from(rawFrame, dkToCelsius);
 
   const header = data.header ? parseHeader(data.header) : undefined;
   return {
     header,
-    frame: celsiusFrame,
+    frame,
     width: shape.width,
     height: shape.height,
     timestamp: data.timestamp,
   };
-};
+}

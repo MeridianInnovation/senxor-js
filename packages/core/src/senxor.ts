@@ -26,7 +26,7 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
   private _isOpen: boolean = false;
 
   private readonly mutex: Mutex = new Mutex();
-  private dataListener?: (data: SenxorData) => void;
+  private dataListener?: (data: SenxorRawData) => void;
   private errorListener?: (error: SenxorError) => void;
   private openListener?: () => void;
   private closeListener?: () => void;
@@ -205,8 +205,15 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
     }
   }
 
-  onData(listener: (data: SenxorData) => void) {
-    this.dataListener = listener;
+  onData(listener: (data: SenxorData) => void, unit?: "C"): void;
+  onData(listener: (data: SenxorData<Uint16Array>) => void, unit: "dK"): void;
+  onData(...[listener, unit]:
+    | [listener: (data: SenxorData) => void, unit?: "C"]
+    | [listener: (data: SenxorData<Uint16Array>) => void, unit: "dK"]
+  ) {
+    this.dataListener = unit === "dK"
+      ? (data) => listener(processRawSenxorData(data, "dK"))
+      : (data) => listener(processRawSenxorData(data));
   }
 
   onError(listener: (error: SenxorError) => void) {
@@ -650,10 +657,8 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
 
   private _handleTransportData(data: SenxorRawData) {
     if (!this._isOpen) return;
-    const senxorData = processRawSenxorData(data);
-
     try {
-      this.dataListener?.(senxorData);
+      this.dataListener?.(data);
     } catch (error) {
       this.errorListener?.(error as SenxorError);
     }
