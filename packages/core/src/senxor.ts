@@ -93,6 +93,8 @@ export class Senxor<TTransport extends ISenxorTransport = ISenxorTransport> {
       if (!this._isOpen) return;
       await this.transport.close();
       this._registers = {};
+      this._fileds = {};
+      this._isStreaming = false;
       this._isOpen = false;
       this.closeListener?.();
     });
