@@ -88,7 +88,6 @@ export class ByteTransport<TPort extends IBytePort>
 
   onError(listener: (error: SenxorTransportError) => void): void {
     this.errorListener = listener;
-    this.commandSender.onError(listener);
   }
 
   onOpen(listener: () => void): void {

@@ -11,7 +11,6 @@ export class CommandSender<TPort extends Pick<IBytePort, "write">> {
     resolve: (value: SenxorAck[keyof SenxorCommand]) => void;
     reject: (error: Error) => void;
   };
-  private errorListener?: (error: SenxorTransportError) => void;
 
   constructor(port: TPort) {
     this.port = port;
@@ -19,7 +18,7 @@ export class CommandSender<TPort extends Pick<IBytePort, "write">> {
   }
 
   onError(listener: (error: SenxorTransportError) => void) {
-    this.errorListener = listener;
+    void listener;
   }
 
   async sendCommand<K extends keyof SenxorCommand>(
