@@ -8,7 +8,7 @@ interface FieldInfo {
   selfReset: boolean;
 }
 
-export const FIELDS: Record<string, FieldInfo> = {
+const fieldDefinitions = {
   SW_RESET: {
     name: "SW_RESET",
     readable: false,
@@ -558,7 +558,10 @@ export const FIELDS: Record<string, FieldInfo> = {
     endBit: 8,
     selfReset: false,
   },
-};
+} satisfies Record<string, FieldInfo>;
+
+export type FieldName = keyof typeof fieldDefinitions;
+export const FIELDS: Record<string, FieldInfo> = fieldDefinitions;
 
 export const REGISTER2FIELD: Record<number, FieldName[]> = (() => {
   const result: Record<number, FieldName[]> = {};
@@ -572,66 +575,3 @@ export const REGISTER2FIELD: Record<number, FieldName[]> = (() => {
   });
   return result;
 })();
-
-export type FieldName =
-  | "SW_RESET"
-  | "DMA_TIMEOUT_ENABLE"
-  | "TIMEOUT_PERIOD"
-  | "STOP_HOST_XFER"
-  | "REQ_RETRANSMIT"
-  | "AUTO_RETRANSMIT"
-  | "GET_SINGLE_FRAME"
-  | "CONTINUOUS_STREAM"
-  | "READOUT_MODE"
-  | "NO_HEADER"
-  | "ADC_ENABLE"
-  | "FW_VERSION_MAJOR"
-  | "FW_VERSION_MINOR"
-  | "FW_VERSION_BUILD"
-  | "FRAME_RATE_DIVIDER"
-  | "SLEEP_PERIOD"
-  | "PERIOD_X100"
-  | "SLEEP"
-  | "READOUT_TOO_SLOW"
-  | "SENXOR_IF_ERROR"
-  | "CAPTURE_ERROR"
-  | "DATA_READY"
-  | "BOOTING_UP"
-  | "CLK_SLOW_DOWN"
-  | "MODULE_GAIN"
-  | "SENXOR_TYPE"
-  | "MODULE_TYPE"
-  | "MCU_TYPE"
-  | "LUT_SOURCE"
-  | "LUT_SELECTOR"
-  | "LUT_VERSION"
-  | "CORR_FACTOR"
-  | "START_COLOFFS_CALIB"
-  | "COLOFFS_CALIB_ON"
-  | "USE_SELF_CALIB"
-  | "CALIB_SAMPLE_SIZE"
-  | "EMISSIVITY"
-  | "OFFSET"
-  | "OTF"
-  | "PRODUCTION_YEAR"
-  | "PRODUCTION_WEEK"
-  | "MANUF_LOCATION"
-  | "SERIAL_NUMBER_0"
-  | "SERIAL_NUMBER_1"
-  | "SERIAL_NUMBER_2"
-  | "USER_FLASH_ENABLE"
-  | "TEMP_UNITS"
-  | "STARK_ENABLE"
-  | "STARK_TYPE"
-  | "SPATIAL_KERNEL"
-  | "STARK_CUTOFF"
-  | "STARK_GRADIENT"
-  | "STARK_SCALE"
-  | "MMS_KXMS"
-  | "MMS_RA"
-  | "MEDIAN_ENABLE"
-  | "MEDIAN_KERNEL_SIZE"
-  | "TEMPORAL_ENABLE"
-  | "TEMPORAL_INIT"
-  | "TEMPORAL_LSB"
-  | "TEMPORAL_MSB";
