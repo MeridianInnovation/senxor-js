@@ -33,10 +33,17 @@ export const MODULE_TYPE = {
   22: "MI0802-50",
   24: "MI0802-M230", // M230-022
   28: "MI1602-M5S",
-  29: "MI1602-M6C",
-  40: "MI1602-M5S", // Panther engineering sample
+  29: "MI1602-M6C_ENG",
+  40: "MI1602-M5SA",
   41: "MI1602-M6C", // Panther engineering sample
-  50: "MI0502-M230F", // Cheetah WFOV, FPC
+  43: "MI1602-M5SB",
+  50: "MI0502-M6S",
+  51: "MI0502-T6S",
+  52: "MI0502-M7C",
+  53: "MI0502-M5S",
+  54: "MI0802-M7C",
+  55: "MI0802-M5SC",
+  56: "MI0802-M6SC",
   255: "MI0801", // Bobcat FW does not have this register; read returns 0xFF
   42: "MI1602-Z6C", // Panther MP, Zn-Alloy LHA
   0: "MI0505-M240", // Cheetah, WFOV, FPC
