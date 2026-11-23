@@ -1,5 +1,5 @@
 import type { ISenxorTransport, SenxorRawData } from "@senxor/core";
-import type { ISerialPort, SerialOptions } from "./types";
+import type { IBytePort, ISerialPort, SerialOptions } from "./types";
 import { PrefixLengthParser } from "serial-packet-parser";
 import {
   messageParserOptions,
@@ -16,10 +16,10 @@ export const senxorPortOptions: SerialOptions = {
   stopbits: 1,
 };
 
-export class SerialTransportBase<TPort extends ISerialPort>
+export class ByteTransport<TPort extends IBytePort>
   implements ISenxorTransport
 {
-  private port: TPort;
+  protected readonly port: TPort;
   private parser: PrefixLengthParser;
   private commandSender: CommandSender<TPort>;
 
@@ -46,12 +46,12 @@ export class SerialTransportBase<TPort extends ISerialPort>
     return this.port.isOpen;
   }
 
-  get deviceInfo() {
+  get deviceInfo(): TPort["deviceInfo"] {
     return this.port.deviceInfo;
   }
 
   async open() {
-    await this.port.open(senxorPortOptions);
+    await this.port.open();
   }
 
   async close() {
@@ -189,5 +189,13 @@ export class SerialTransportBase<TPort extends ISerialPort>
   private handleUnknownAck(cmd: string) {
     const err = new SenxorTransportError(`Unknown ACK: ${cmd}`);
     this.errorListener?.(err);
+  }
+}
+
+export class SerialTransportBase<
+  TPort extends ISerialPort
+> extends ByteTransport<TPort> {
+  async open() {
+    await this.port.open(senxorPortOptions);
   }
 }

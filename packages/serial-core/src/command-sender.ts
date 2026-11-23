@@ -1,8 +1,8 @@
 import { SenxorTransportError } from "@senxor/core";
 import { Mutex } from "async-mutex";
-import type { ISerialPort, SenxorAck, SenxorCommand } from "./types.ts";
+import type { IBytePort, SenxorAck, SenxorCommand } from "./types.ts";
 
-export class CommandSender<TPort extends ISerialPort> {
+export class CommandSender<TPort extends Pick<IBytePort, "write">> {
   private port: TPort;
   private commandMutex: Mutex;
   private encoder = new TextEncoder();

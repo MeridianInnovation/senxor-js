@@ -11,13 +11,10 @@ export interface SerialOptions {
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-export interface ISerialPort<
-  TDeviceInfo extends SerialDeviceInfo = SerialDeviceInfo,
-  TOptions extends SerialOptions = SerialOptions
-> {
+export interface IBytePort<TDeviceInfo extends object = object> {
   deviceInfo: TDeviceInfo;
   isOpen: boolean;
-  open(options?: TOptions): Promise<void>;
+  open(): Promise<void>;
   close(): Promise<void>;
   write(data: Uint8Array): Promise<void>;
   on(event: "data", listener: (data: Uint8Array) => void): () => void;
@@ -25,6 +22,13 @@ export interface ISerialPort<
   on(event: "open", listener: () => void): () => void;
   on(event: "close", listener: () => void): () => void;
   on(event: "disconnect", listener: () => void): () => void;
+}
+
+export interface ISerialPort<
+  TDeviceInfo extends SerialDeviceInfo = SerialDeviceInfo,
+  TOptions extends SerialOptions = SerialOptions
+> extends IBytePort<TDeviceInfo> {
+  open(options?: TOptions): Promise<void>;
 }
 
 export type SenxorCommand = {

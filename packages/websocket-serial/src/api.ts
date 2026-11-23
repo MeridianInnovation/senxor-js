@@ -1,5 +1,5 @@
 import { Senxor } from "@senxor/core";
-import { SerialTransportBase } from "@senxor/serial-core";
+import { ByteTransport } from "@senxor/serial-core";
 
 import { WebsocketPort } from "./websocket-port";
 
@@ -8,8 +8,8 @@ export function createWebsocketSerialSenxor(
   port?: number,
   path?: string,
   secure?: boolean,
-): Senxor<SerialTransportBase<WebsocketPort>> {
+): Senxor<ByteTransport<WebsocketPort>> {
   const websocketPort = new WebsocketPort(host, port, path, secure);
-  const transport = new SerialTransportBase(websocketPort);
+  const transport = new ByteTransport(websocketPort);
   return new Senxor(transport);
 }

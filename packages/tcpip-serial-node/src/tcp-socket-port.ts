@@ -1,8 +1,10 @@
 import { connect, type Socket } from "node:net";
 
-import type { ISerialPort, SerialOptions } from "@senxor/serial-core";
-
-import { PortEmitter } from "./port-emitter";
+import {
+  PortEmitter,
+  type IBytePort,
+  type SerialOptions,
+} from "@senxor/serial-core";
 
 export interface TcpIpSerialDeviceInfo {
   vendorId: number;
@@ -11,10 +13,7 @@ export interface TcpIpSerialDeviceInfo {
   port: number;
 }
 
-export class TcpSocketPort implements ISerialPort<
-  TcpIpSerialDeviceInfo,
-  SerialOptions
-> {
+export class TcpSocketPort implements IBytePort<TcpIpSerialDeviceInfo> {
   readonly deviceInfo: TcpIpSerialDeviceInfo;
 
   private readonly emitter = new PortEmitter();

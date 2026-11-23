@@ -1,8 +1,11 @@
-import type { ISerialPort, SerialOptions } from "@senxor/serial-core";
+import {
+  PortEmitter,
+  type IBytePort,
+  type SerialOptions,
+} from "@senxor/serial-core";
 import { DataEncoding, TcpSocket } from "capacitor-tcp-socket";
 
 import { base64ToUint8Array, uint8ArrayToBase64 } from "./binary-codec";
-import { PortEmitter } from "./port-emitter";
 
 const READ_BUFFER_SIZE = 8192;
 const READ_TIMEOUT_SECONDS = 10;
@@ -14,10 +17,7 @@ export interface TcpIpSerialDeviceInfo {
   port: number;
 }
 
-export class TcpCapacitorSocketPort implements ISerialPort<
-  TcpIpSerialDeviceInfo,
-  SerialOptions
-> {
+export class TcpCapacitorSocketPort implements IBytePort<TcpIpSerialDeviceInfo> {
   readonly deviceInfo: TcpIpSerialDeviceInfo;
 
   private readonly emitter = new PortEmitter();

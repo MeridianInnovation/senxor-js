@@ -1,6 +1,8 @@
-import type { ISerialPort, SerialOptions } from "@senxor/serial-core";
-
-import { PortEmitter } from "./port-emitter";
+import {
+  PortEmitter,
+  type IBytePort,
+  type SerialOptions,
+} from "@senxor/serial-core";
 
 export interface WebsocketSerialDeviceInfo {
   vendorId: number;
@@ -11,10 +13,7 @@ export interface WebsocketSerialDeviceInfo {
   secure: boolean;
 }
 
-export class WebsocketPort implements ISerialPort<
-  WebsocketSerialDeviceInfo,
-  SerialOptions
-> {
+export class WebsocketPort implements IBytePort<WebsocketSerialDeviceInfo> {
   readonly deviceInfo: WebsocketSerialDeviceInfo;
 
   private readonly emitter = new PortEmitter();

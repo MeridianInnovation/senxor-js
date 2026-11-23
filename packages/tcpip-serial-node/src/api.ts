@@ -1,13 +1,13 @@
 import { Senxor } from "@senxor/core";
-import { SerialTransportBase } from "@senxor/serial-core";
+import { ByteTransport } from "@senxor/serial-core";
 
 import { TcpSocketPort } from "./tcp-socket-port";
 
 export function createTcpIpSerialSenxor(
   host: string,
   port: number,
-): Senxor<SerialTransportBase<TcpSocketPort>> {
+): Senxor<ByteTransport<TcpSocketPort>> {
   const socketPort = new TcpSocketPort(host, port);
-  const transport = new SerialTransportBase(socketPort);
+  const transport = new ByteTransport(socketPort);
   return new Senxor(transport);
 }
