@@ -46,12 +46,10 @@ export class CommandSender<TPort extends Pick<IBytePort, "write">> {
         `ACK type mismatch: expected ${this.pendingCommand.type}, received ${type}`,
       );
       this.pendingCommand.reject(err);
-      this.pendingCommand = undefined;
       return;
     }
 
     this.pendingCommand.resolve(data);
-    this.pendingCommand = undefined;
   }
 
   private async sendCommandWithRetry<K extends keyof SenxorCommand>(
@@ -77,25 +75,33 @@ export class CommandSender<TPort extends Pick<IBytePort, "write">> {
     timeout: number,
   ): Promise<SenxorAck[K]> {
     return new Promise((resolve, reject) => {
-      this.pendingCommand = {
+      const pending = {
         type,
-        resolve: resolve as (value: SenxorAck[keyof SenxorCommand]) => void,
-        reject: reject,
+        resolve: (value: SenxorAck[keyof SenxorCommand]) => {
+          if (this.pendingCommand !== pending) return;
+          clearTimeout(timeoutId);
+          this.pendingCommand = undefined;
+          resolve(value as SenxorAck[K]);
+        },
+        reject: (error: Error) => {
+          if (this.pendingCommand !== pending) return;
+          clearTimeout(timeoutId);
+          this.pendingCommand = undefined;
+          reject(error);
+        },
       };
 
       const timeoutId = setTimeout(() => {
-        this.pendingCommand = undefined;
-        reject(
+        pending.reject(
           new SenxorTransportError(
             `Command timeout: no ACK received for ${type}`,
           ),
         );
       }, timeout);
+      this.pendingCommand = pending;
 
       this.port.write(this.encoder.encode(command)).catch((err) => {
-        clearTimeout(timeoutId);
-        this.pendingCommand = undefined;
-        reject(
+        pending.reject(
           new SenxorTransportError(
             `Failed to write command: ${type}`,
             err as Error,
