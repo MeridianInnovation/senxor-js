@@ -106,6 +106,19 @@ importers:
         specifier: ^4.0.18
         version: 4.1.0(@types/node@25.5.0)(vite@7.2.0(@types/node@25.5.0)(jiti@2.6.1)(yaml@2.8.2))
 
+  packages/tcpip-serial-capacitor:
+    dependencies:
+      '@senxor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@senxor/serial-core':
+        specifier: workspace:*
+        version: link:../serial-core
+    devDependencies:
+      capacitor-tcp-socket:
+        specifier: 7.1.1
+        version: 7.1.1(@capacitor/core@8.2.0)
+
   packages/tcpip-serial-node:
     dependencies:
       '@senxor/core':
@@ -851,6 +864,11 @@ packages:
     resolution: {integrity: sha512-3oA3FkCEUEboPWH6CvISeiA7d9q5W3BwvRcAp7hB1dqZ37F1yRN1+3L7vQdXl/2vs2ofdhJ6+QF6OWqRdLLq3A==}
     peerDependencies:
       '@capacitor/core': ^7.1.0
+
+  capacitor-tcp-socket@7.1.1:
+    resolution: {integrity: sha512-52p7NhG2f9GHcI8bq/nvvlc8uw3Qa4gXBfsOHc8aHfZUU/3/bWK/zSV+R3YGJDSERTEp95H0XMCrN8FgVyc8Mw==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -2162,6 +2180,10 @@ snapshots:
   callsites@3.1.0: {}
 
   capacitor-serial-plugin@1.1.2(@capacitor/core@8.2.0):
+    dependencies:
+      '@capacitor/core': 8.2.0
+
+  capacitor-tcp-socket@7.1.1(@capacitor/core@8.2.0):
     dependencies:
       '@capacitor/core': 8.2.0
 

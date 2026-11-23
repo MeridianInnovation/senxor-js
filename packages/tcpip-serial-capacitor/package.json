@@ -1,0 +1,47 @@
+{
+  "name": "@senxor/tcpip-serial-capacitor",
+  "version": "1.0.0",
+  "description": "Capacitor TCP/IP serial transport for Senxor devices.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/MeridianInnovation/senxor-js#readme",
+  "bugs": {
+    "url": "https://github.com/MeridianInnovation/senxor-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeridianInnovation/senxor-js.git"
+  },
+  "author": "Shui <zelongshui@meridianinno.com>",
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@senxor/core": "workspace:*",
+    "@senxor/serial-core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "devDependencies": {
+    "capacitor-tcp-socket": "7.1.1"
+  },
+  "peerDependencies": {
+    "capacitor-tcp-socket": "^7.1.1"
+  }
+}
