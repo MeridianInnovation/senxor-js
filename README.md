@@ -6,6 +6,9 @@ It provides a small set of packages that separate core protocol and processing l
 - `@senxor/core`: core protocol, Senxor class, processors, and error types.
 - `@senxor/web-serial`: browser transport using the Web Serial API.
 - `@senxor/capacitor-serial`: transport for Capacitor apps (for example, Android).
+- `@senxor/tcpip-serial-node`: TCP/IP serial transport for Node.js.
+- `@senxor/tcpip-serial-capacitor`: TCP/IP serial transport for Capacitor apps.
+- `@senxor/websocket-serial`: WebSocket serial transport for browsers.
 - `@senxor/serial-core`: internal/shared serial transport core for building new transports.
 
 GitHub: https://github.com/MeridianInnovation/senxor-js
@@ -44,6 +47,12 @@ Transport for Capacitor apps, for example an Android app using a WebView.
 - Exposes helpers to list and connect to Senxor devices from your Capacitor app and gives you a `Senxor` instance for each connection.
 
 See the `@senxor/capacitor-serial` [README](packages/capacitor-serial/README.md) for setup steps in a Capacitor project and usage examples.
+
+### Network transports
+
+- [`@senxor/tcpip-serial-node`](packages/tcpip-serial-node/README.md) connects to serial devices over TCP/IP in Node.js.
+- [`@senxor/tcpip-serial-capacitor`](packages/tcpip-serial-capacitor/README.md) connects over TCP/IP in Capacitor apps and requires `capacitor-tcp-socket` ^7.1.1.
+- [`@senxor/websocket-serial`](packages/websocket-serial/README.md) connects to serial devices over WebSocket in browsers.
 
 ### `@senxor/serial-core` (internal / advanced)
 

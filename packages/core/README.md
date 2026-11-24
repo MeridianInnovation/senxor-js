@@ -38,7 +38,7 @@ Typical capabilities include:
   - `startStreaming()` – enable continuous frame streaming.
   - `stopStreaming()` – disable continuous frame streaming.
 - Event-style callbacks:
-  - `onData(listener: (data: SenxorData) => void)` – receive processed frames.
+  - `onData(listener: (data: SenxorData) => void, unit?: "C")` – receive Celsius frames; use `onData(listener, "dK")` to receive frames in 0.1 K units.
   - `onError(listener: (error: SenxorError) => void)` – receive errors during operation.
   - `onOpen(listener: () => void)` – notified when the device is successfully opened.
   - `onClose(listener: () => void)` – notified when the device is closed.
@@ -85,6 +85,26 @@ Typical capabilities include:
 
 
 Transport packages such as `@senxor/web-serial` and `@senxor/capacitor-serial` create and manage `Senxor` instances for you. In typical usage you receive a `Senxor` from a transport API, subscribe to its events, and then call `open()`, `startStreaming()`, and `stopStreaming()` as needed.
+
+## Frame units
+
+By default, `onData` delivers `data.frame` as a `Float32Array` of Celsius values:
+
+```ts
+senxor.onData((data) => {
+  const celsius = data.frame[0];
+});
+```
+
+Pass `"dK"` to receive a `Uint16Array` in units of 0.1 K:
+
+```ts
+senxor.onData((data) => {
+  const celsius = data.frame[0] * 0.1 - 273.15;
+}, "dK");
+```
+
+Registering `onData` again replaces the previous callback. Temperature fields in the frame header remain in Celsius for both units. The existing processors accept Celsius `Float32Array` frames; convert dK values with `value * 0.1 - 273.15` before passing them to those processors.
 
 ## Processing helpers (processors)
 

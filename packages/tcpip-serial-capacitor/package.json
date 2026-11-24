@@ -1,6 +1,6 @@
 {
   "name": "@senxor/tcpip-serial-capacitor",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "Capacitor TCP/IP serial transport for Senxor devices.",
   "type": "module",
   "license": "Apache-2.0",

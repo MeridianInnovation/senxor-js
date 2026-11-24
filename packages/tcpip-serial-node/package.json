@@ -1,6 +1,6 @@
 {
   "name": "@senxor/tcpip-serial-node",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Node.js TCP/IP serial transport for Senxor devices.",
   "type": "module",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
   "files": [
     "dist"
   ],
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"

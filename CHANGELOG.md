@@ -1,3 +1,18 @@
+## 1.3.0 (2026-11-24)
+
+### @senxor/core
+
+- Receive frames as `Uint16Array` values in 0.1 K units with `onData(listener, "dK")`.
+- Recognize additional module models and display corrected model names.
+
+### @senxor/tcpip-serial-capacitor
+
+- Connect to Senxor devices over TCP from Capacitor apps. This package requires `capacitor-tcp-socket` ^7.1.1.
+
+### Network transports
+
+- Explicitly closing a connection now calls `onClose`; unexpected connection loss calls `onDisconnect`.
+
 ## 1.2.0 (2026-05-27)
 
 ### @senxor/tcpip-serial-node
